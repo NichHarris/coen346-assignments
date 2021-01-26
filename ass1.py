@@ -10,4 +10,5 @@ if __name__ == '__main__':
     values = list()
     for i in range(len(lines)):
         values.append(int(lines[i].strip('\n')))
-    mergesort(values)
+    thread = threading.Thread(target=mergesort)
+    thread.join()
