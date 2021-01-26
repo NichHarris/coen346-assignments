@@ -4,11 +4,13 @@ def mergesort(arr: list):
     return None
 
 if __name__ == '__main__':
-    file = open('input.txt', mode = 'r', encoding = 'utf-8-sig')
-    lines = file.readlines()
+    with open('input.txt', 'r') as file:
+        lines = file.readlines()
     file.close()
-    values = list()
+
+    values = []
     for i in range(len(lines)):
         values.append(int(lines[i].strip('\n')))
-    thread = threading.Thread(target=mergesort)
+    thread = threading.Thread(target=mergesort(values))
+    thread.start()
     thread.join()
