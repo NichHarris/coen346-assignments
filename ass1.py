@@ -8,31 +8,37 @@
 
 import threading
 
+
 # mergesort function which utilizes threading
 
-def merge(leftArr, rightArr):
+def merge(left_arr, right_arr):
     left = right = 0
     result = []
 
-    while left < len(leftArr) and right < len(rightArr):
-        if leftArr[left] <= rightArr[right]:
-            result.append(leftArr[left])
+    while left < len(left_arr) and right < len(right_arr):
+        if left_arr[left] <= right_arr[right]:
+            result.append(left_arr[left])
             left += 1
         else:
-            result.append(rightArr[right])
+            result.append(right_arr[right])
             right += 1
-    result += leftArr[left:]
-    result += rightArr[right:]
+    result += left_arr[left:]
+    result += right_arr[right:]
     return result
 
 
-def mergesort(arr: list):
+def merge_sort(arr: list):
     if len(arr) <= 1:
         return arr
     else:
         mid = len(arr)//2
-        left, right = mergesort(arr[:mid]), mergesort(arr[mid:])
-        return merge(left,right)
+        left_arr, right_arr = merge_sort(arr[:mid]), merge_sort(arr[mid:])
+        return merge(left_arr,right_arr)
+
+
+def threading_output(val):
+    print("Thread {} started".format(threading.current_thread().ident))
+    print("Thread {} finished:".format(threading.current_thread().ident, val))
 
 if __name__ == '__main__':
     # open input.txt and read the lines
@@ -45,8 +51,8 @@ if __name__ == '__main__':
     for i in range(len(lines)):
         values.append(int(lines[i].strip('\n')))
 
-    print(mergesort(values))
+    # print(merge_sort(values))
     # create a thread for the mergesort function
-    # thread = threading.Thread(target=mergesort(values))
-    # thread.start()
-    # thread.join()
+    thread = threading.Thread(target=threading_output(values))
+    thread.start()
+    thread.join()
