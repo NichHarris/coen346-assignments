@@ -8,37 +8,41 @@
 
 import threading
 
-
 # mergesort function which utilizes threading
+class Assignment1:
+    
+    def __init__(self, input):
+        self.input = input
+        self.output = None
 
-def merge(left_arr, right_arr):
-    left = right = 0
-    result = []
+    def merge(self, left_arr, right_arr):
+        left = right = 0
+        result = []
 
-    while left < len(left_arr) and right < len(right_arr):
-        if left_arr[left] <= right_arr[right]:
-            result.append(left_arr[left])
-            left += 1
+        while left < len(left_arr) and right < len(right_arr):
+            if left_arr[left] <= right_arr[right]:
+                result.append(left_arr[left])
+                left += 1
+            else:
+                result.append(right_arr[right])
+                right += 1
+        result += left_arr[left:]
+        result += right_arr[right:]
+        return result
+
+
+    def merge_sort(self, arr: list):
+        if len(arr) <= 1:
+            return arr
         else:
-            result.append(right_arr[right])
-            right += 1
-    result += left_arr[left:]
-    result += right_arr[right:]
-    return result
+            mid = len(arr)//2
+            left_arr, right_arr = self.merge_sort(arr[:mid]), self.merge_sort(arr[mid:])
+            return self.merge(left_arr,right_arr)
 
 
-def merge_sort(arr: list):
-    if len(arr) <= 1:
-        return arr
-    else:
-        mid = len(arr)//2
-        left_arr, right_arr = merge_sort(arr[:mid]), merge_sort(arr[mid:])
-        return merge(left_arr,right_arr)
-
-
-def threading_output(val):
-    print("Thread {} started".format(threading.current_thread().ident))
-    print("Thread {} finished:".format(threading.current_thread().ident, val))
+    def threading_output(self, val):
+        print("Thread {} started".format(threading.current_thread().ident))
+        print("Thread {} finished: {}".format(threading.current_thread().ident, val))
 
 if __name__ == '__main__':
     # open input.txt and read the lines
