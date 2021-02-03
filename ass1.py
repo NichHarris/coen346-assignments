@@ -7,7 +7,8 @@
 # Merge-sort using multithreading
 
 import threading
-
+import logging
+import time
 
 # mergesort function which utilizes threading
 
@@ -35,10 +36,23 @@ def merge_sort(arr: list):
         left_arr, right_arr = merge_sort(arr[:mid]), merge_sort(arr[mid:])
         return merge(left_arr,right_arr)
 
+class myThread(threading.Thread):
+    def __init__(self, threadBin, val, count):
+        threading.Thread.__init__(self)
+        self.threadBin = threadBin
+        self.val = val
+        self.count = count
+
+    def run(self):
+        print("Thread {} started".format(self.threadBin))
+        time.sleep(2)
+        print("Thread {} finished: {}".format(self.threadBin, self.val))
+
+
 
 def threading_output(val):
     print("Thread {} started".format(threading.current_thread().ident))
-    print("Thread {} finished:".format(threading.current_thread().ident, val))
+    print("Thread {} finished: {}".format(threading.current_thread().ident, val))
 
 if __name__ == '__main__':
     # open input.txt and read the lines
@@ -53,6 +67,7 @@ if __name__ == '__main__':
 
     # print(merge_sort(values))
     # create a thread for the mergesort function
-    thread = threading.Thread(target=threading_output(values))
+    thread = threading.Thread(merge_sort, values)
     thread.start()
     thread.join()
+    print(values)
