@@ -9,10 +9,11 @@
 import threading
 from concurrent.futures import ThreadPoolExecutor
 
-def merge(left_arr, right_arr):
+def merge(left_arr, right_arr, futures, output):
     left = right = 0
     result = []
-
+    print("{}\n".format(left_arr.result()))
+    print("{}\n".format(right_arr.result()))
     while left < len(left_arr) and right < len(right_arr):
         if left_arr[left] <= right_arr[right]:
             result.append(left_arr[left])
@@ -20,27 +21,26 @@ def merge(left_arr, right_arr):
         else:
             result.append(right_arr[right])
             right += 1
-    result += left_arr[left:]
-    result += right_arr[right:]
+    result += left_arr[left:].result()
+    output.write("Thread {} finished: {}\n".format(threading.current_thread().ident, left_arr[left:]))
+    result += right_arr[right:].result()
+    output.write("Thread {} finished: {}\n".format(threading.current_thread().ident, right_arr[right:]))
     return result
 
 
 def merge_sort(arr: list, futures, output):
+    #print(threading.active_count())  # keep track of threads
     if len(arr) <= 1:
         return arr
     else:
-        with ThreadPoolExecutor as executor:  # start multithreading
+        with ThreadPoolExecutor(max_workers = 25) as executor:  # start multithreading
             mid = len(arr)//2
             left_arr = executor.submit(merge_sort, arr[:mid], futures, output)  # schedules a callable
             futures.append(left_arr)  # add result to list
             right_arr = executor.submit(merge_sort, arr[mid:], futures, output)  # schedules a callable
             futures.append(right_arr)  # add result to list
-            return merge(left_arr,right_arr, futures, output)
-
-
-def threading_output(self, val):
-    print("Thread {} started".format(threading.current_thread().ident))
-    print("Thread {} finished: {}".format(threading.current_thread().ident, val))
+            output.write("Thread {} started\n".format(threading.current_thread().ident))
+            return merge(left_arr, right_arr, futures, output)
 
 if __name__ == '__main__':
     # open input.txt and read the lines
@@ -54,7 +54,7 @@ if __name__ == '__main__':
         values.append(int(lines[i].strip('\n')))
     
     # open the output file
-    output = open("output.txt", "a")
+    output = open("output.txt", "w")
 
     futures = []
     merge_sort(values, futures, output)
