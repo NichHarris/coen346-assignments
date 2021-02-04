@@ -77,10 +77,5 @@ if __name__ == '__main__':
 
     futures = []
 
-    t1 = perf_counter()
     result = merge_sort(values, futures, output)
     print(result)
-
-    t2 = perf_counter()
-
-    print("Elapsed time: {}:".format(t2-t1))
