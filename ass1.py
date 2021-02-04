@@ -7,7 +7,7 @@
 # Merge-sort using multithreading
 
 import threading
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from time import perf_counter
 
 class FileManager:
@@ -15,6 +15,7 @@ class FileManager:
     def __init__(self):
         # open the output file
         self.output = open("output.txt", "w")
+        self.futures = []
 
     def merge(self, left_arr, right_arr):
         left = right = 0
@@ -40,12 +41,15 @@ class FileManager:
             with ThreadPoolExecutor(max_workers = 15) as executor:
                 mid = len(arr)//2
                 left_arr = executor.submit(self.merge_sort, arr[:mid])
+                self.futures.append(left_arr)
                 right_arr = executor.submit(self.merge_sort, arr[mid:])
-                self.output.write("Thread {} started\n".format(threading.current_thread().ident))
+                self.futures.append(right_arr)
+                #self.output.write("Thread {} started\n".format(threading.current_thread().ident))
+                
             left = left_arr.result()
-            self.output.write("Thread {} finished: {}\n".format(threading.current_thread().ident, left))
+            #self.output.write("Thread {} finished: {}\n".format(threading.current_thread().ident, left))
             right = right_arr.result()
-            self.output.write("Thread {} finished: {}\n".format(threading.current_thread().ident, right))
+            #self.output.write("Thread {} finished: {}\n".format(threading.current_thread().ident, right))
             return self.merge(left, right)
 
 if __name__ == '__main__':
