@@ -40,14 +40,13 @@ class FileManager:
             with ThreadPoolExecutor(max_workers = 15) as executor:
                 mid = len(arr)//2
                 left_arr = executor.submit(self.merge_sort, arr[:mid])
-                self.output.write("Thread {} started\n".format(threading.current_thread().ident))
                 right_arr = executor.submit(self.merge_sort, arr[mid:])
                 self.output.write("Thread {} started\n".format(threading.current_thread().ident))
-                left = left_arr.result()
-                self.output.write("Thread {} finished: {}\n".format(threading.current_thread().ident, left))
-                right = right_arr.result()
-                self.output.write("Thread {} finished: {}\n".format(threading.current_thread().ident, right))
-                return self.merge(left, right)
+            left = left_arr.result()
+            self.output.write("Thread {} finished: {}\n".format(threading.current_thread().ident, left))
+            right = right_arr.result()
+            self.output.write("Thread {} finished: {}\n".format(threading.current_thread().ident, right))
+            return self.merge(left, right)
 
 if __name__ == '__main__':
     # open input.txt and read the lines
