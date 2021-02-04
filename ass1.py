@@ -8,6 +8,7 @@
 
 import threading
 from concurrent.futures import ThreadPoolExecutor
+from time import perf_counter
 
 def merge(left_arr, right_arr, futures, output):
     left = right = 0
@@ -73,6 +74,12 @@ if __name__ == '__main__':
     # open the output file
     output = open("output.txt", "w")
 
+    t1 = perf_counter()
+
     futures = []
     result = merge_sort(values, futures, output)
     print(result)
+
+    t2 = perf_counter()
+
+    print("Elapsed time: {}:".format(t2-t1))
