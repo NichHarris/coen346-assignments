@@ -12,7 +12,20 @@ from concurrent.futures import ThreadPoolExecutor
 def merge(left_arr, right_arr, futures, output):
     left = right = 0
     result = []
+
+    # We basically want to check if the thread is finished running
+    # if it isnt, then we wait for it to finish and then we can 
+    # access the value stored in it with .result() -> closing it
+    # this is definitely not the way to do it but the idea of it
     
+    while not left_arr.done():
+        continue
+    left_arr = left_arr.result()
+   
+    while not right_arr.done():
+        continue
+    right_arr = right_arr.result()
+
     print("{}\n".format(left_arr))
     print("{}\n".format(right_arr))
 
@@ -40,11 +53,11 @@ def merge_sort(arr: list, futures, output):
         with ThreadPoolExecutor(max_workers = 50) as executor:  # start multithreading
             mid = len(arr)//2
             left_arr = executor.submit(merge_sort, arr[:mid], futures, output)  # schedules a callable
-            futures.append(left_arr)  # add result to list
+            futures.append(left_arr)  # add left_arr to list
             right_arr = executor.submit(merge_sort, arr[mid:], futures, output)  # schedules a callable
-            futures.append(right_arr)  # add result to list
+            futures.append(right_arr)  # add right_arr to list
             output.write("Thread {} started\n".format(threading.current_thread().ident))
-            return merge(left_arr.result(), right_arr.result(), futures, output)
+            return merge(left_arr, right_arr, futures, output)
 
 if __name__ == '__main__':
     # open input.txt and read the lines
