@@ -7,14 +7,14 @@
 # Merge-sort using multithreading
 
 import threading
-import logging
-import time
+from concurrent.futures import ThreadPoolExecutor
 
-# mergesort function which utilizes threading
-
-def merge(left_arr, right_arr):
+def merge(left_arr, right_arr, futures, output):
     left = right = 0
     result = []
+    
+    print("{}\n".format(left_arr))
+    print("{}\n".format(right_arr))
 
     while left < len(left_arr) and right < len(right_arr):
         if left_arr[left] <= right_arr[right]:
@@ -24,35 +24,27 @@ def merge(left_arr, right_arr):
             result.append(right_arr[right])
             right += 1
     result += left_arr[left:]
+    # output.write("Thread {} finished: {}\n".format(threading.current_thread().ident, left_arr[left:]))
     result += right_arr[right:]
+    # output.write("Thread {} finished: {}\n".format(threading.current_thread().ident, right_arr[right:]))
+
+    output.write("Thread {} finished: {}\n".format(threading.current_thread().ident, result))
     return result
 
 
-def merge_sort(arr: list):
+def merge_sort(arr: list, futures, output):
+    #print(threading.active_count())  # keep track of threads
     if len(arr) <= 1:
         return arr
     else:
-        mid = len(arr)//2
-        left_arr, right_arr = merge_sort(arr[:mid]), merge_sort(arr[mid:])
-        return merge(left_arr,right_arr)
-
-class myThread(threading.Thread):
-    def __init__(self, threadBin, val, count):
-        threading.Thread.__init__(self)
-        self.threadBin = threadBin
-        self.val = val
-        self.count = count
-
-    def run(self):
-        print("Thread {} started".format(self.threadBin))
-        time.sleep(2)
-        print("Thread {} finished: {}".format(self.threadBin, self.val))
-
-
-
-def threading_output(val):
-    print("Thread {} started".format(threading.current_thread().ident))
-    print("Thread {} finished: {}".format(threading.current_thread().ident, val))
+        with ThreadPoolExecutor(max_workers = 50) as executor:  # start multithreading
+            mid = len(arr)//2
+            left_arr = executor.submit(merge_sort, arr[:mid], futures, output)  # schedules a callable
+            futures.append(left_arr)  # add result to list
+            right_arr = executor.submit(merge_sort, arr[mid:], futures, output)  # schedules a callable
+            futures.append(right_arr)  # add result to list
+            output.write("Thread {} started\n".format(threading.current_thread().ident))
+            return merge(left_arr.result(), right_arr.result(), futures, output)
 
 if __name__ == '__main__':
     # open input.txt and read the lines
@@ -64,10 +56,10 @@ if __name__ == '__main__':
     values = []
     for i in range(len(lines)):
         values.append(int(lines[i].strip('\n')))
+    
+    # open the output file
+    output = open("output.txt", "w")
 
-    # print(merge_sort(values))
-    # create a thread for the mergesort function
-    thread = threading.Thread(merge_sort, values)
-    thread.start()
-    thread.join()
-    print(values)
+    futures = []
+    result = merge_sort(values, futures, output)
+    print(result)
