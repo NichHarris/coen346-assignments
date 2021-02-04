@@ -14,7 +14,6 @@ class FileManager:
 
     def __init__(self):
         # open the output file
-        self.futures = []
         self.output = open("output.txt", "w")
 
     def merge(self, left_arr, right_arr):
@@ -26,13 +25,13 @@ class FileManager:
         # access the value stored in it with .result() -> closing it
         # this is definitely not the way to do it but the idea of it
         
-        while not left_arr.done():
-            continue
-        left_arr = left_arr.result()
+        #while not left_arr.done():
+        #    continue
+        #left_arr = left_arr.result()
     
-        while not right_arr.done():
-            continue
-        right_arr = right_arr.result()
+        #while not right_arr.done():
+        #    continue
+        #right_arr = right_arr.result()
 
         #print("{}\n".format(left_arr))
         #print("{}\n".format(right_arr))
@@ -44,13 +43,10 @@ class FileManager:
             else:
                 result.append(right_arr[right])
                 right += 1
-        self.output.write("Thread {} finished: {}\n".format(threading.current_thread().ident, result))
         result += left_arr[left:]
         # output.write("Thread {} finished: {}\n".format(threading.current_thread().ident, left_arr[left:]))
         result += right_arr[right:]
         # output.write("Thread {} finished: {}\n".format(threading.current_thread().ident, right_arr[right:]))
-
-        self.output.write("Thread {} finished: {}\n".format(threading.current_thread().ident, result))
         return result
 
 
@@ -59,14 +55,17 @@ class FileManager:
         if len(arr) <= 1:
             return arr
         else:
-            with ThreadPoolExecutor(max_workers = 50) as executor:  # start multithreading
+            with ThreadPoolExecutor(max_workers = 25) as executor:  # start multithreading
                 mid = len(arr)//2
                 left_arr = executor.submit(self.merge_sort, arr[:mid])  # schedules a callable
-                self.futures.append(left_arr)  # add left_arr to list
-                right_arr = executor.submit(self.merge_sort, arr[mid:])  # schedules a callable
-                self.futures.append(right_arr)  # add right_arr to list
                 self.output.write("Thread {} started\n".format(threading.current_thread().ident))
-                return self.merge(left_arr, right_arr)
+                left = left_arr.result()
+                self.output.write("Thread {} finished: {}\n".format(threading.current_thread().ident, left))
+                right_arr = executor.submit(self.merge_sort, arr[mid:])  # schedules a callable
+                self.output.write("Thread {} started\n".format(threading.current_thread().ident))
+                right = right_arr.result()
+                self.output.write("Thread {} finished: {}\n".format(threading.current_thread().ident, right))
+                return self.merge(left, right)
 
 if __name__ == '__main__':
     # open input.txt and read the lines
