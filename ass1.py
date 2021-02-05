@@ -19,7 +19,7 @@ class FileManager:
 
     def merge(self, left_arr, right_arr):
         # keep track of active threads in merge()
-        print("in merge: {}".format(threading.active_count()))
+        # print("in merge: {}".format(threading.active_count()))
 
         # pointers for traversing the two sublists (left_arr and right_arr)
         left = right = 0
@@ -58,14 +58,15 @@ class FileManager:
         # merge_sort function) to output.txt
         self.output.write("Thread {} started\n".format(threading.current_thread().ident))
         # keep track of active threads in merge_sort()
-        print(threading.active_count())
+        # print(threading.active_count())s
         # if the sublist contains more than one element, continue splitting recursively
         if len(arr) > 1:
-            # get the mid pointer for splitting lists
+            # get the floor of the mid pointer for splitting lists
             mid = len(arr)//2
             # instantiate a ThreadPoolExecutor to submit threads and terminate threads upon completion
             with ThreadPoolExecutor(max_workers = 15) as executor:
                 # execute a thread for both the left and right portion of the split list
+                # NOTE: arr[:mid] will only return the sublist from index 0 to mid-1
                 left_arr = executor.submit(self.merge_sort, arr[:mid])
                 right_arr = executor.submit(self.merge_sort, arr[mid:])
             # exit the list to allow result collection and begin merging the sub lists
@@ -86,11 +87,11 @@ if __name__ == '__main__':
 
     # close the file
     file.close()
-
     # create a list of integers from the lines read
     values = []
-    for i in range(len(lines)):
-        values.append(int(lines[i].strip('\n')))
+
+    for line in lines:
+        values.append(int(line.strip('\n')))
 
     # sort the list of integers using recursive multithreading
     result = FileManager().merge_sort(values)
