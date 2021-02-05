@@ -1,63 +1,30 @@
-<<<<<<< HEAD
+Thread 6924 started
+Thread 2280 started
+Thread 15600 started
+Thread 6600 started
+Thread 15120 started
+Thread 4268 started
 Thread 3524 started
-Thread 16680 started
-Thread 7068 started
-Thread 18852 started
-Thread 11404 started
-Thread 9272 started
-Thread 9904 started
-Thread 9904 finished: [3304]
-Thread 17888 started
-Thread 17888 finished: [26849]
-Thread 1384 started
-Thread 4636 started
-Thread 4636 finished: [1509]
-Thread 9904 started
-Thread 9904 finished: [8221]
-Thread 17888 started
-Thread 17888 finished: [14038]
-Thread 12736 started
-Thread 12736 finished: [7856]
-Thread 4636 started
-Thread 4636 finished: [6367]
-Thread 12736 started
-Thread 12736 finished: [21362]
-Thread 18852 finished: [3304, 8221]
-Thread 9272 finished: [1509, 6367]
-Thread 1384 finished: [7856, 21362]
-Thread 7068 finished: [1509, 6367, 7856, 21362]
-Thread 11404 finished: [14038, 26849]
-Thread 16680 finished: [3304, 8221, 14038, 26849]
-Thread 3524 finished: [1509, 3304, 6367, 7856, 8221, 14038, 21362, 26849]
-=======
-Thread 14948 started
-Thread 29312 started
-Thread 31452 started
-Thread 32280 started
-Thread 26448 started
-Thread 24260 started
-Thread 29384 started
-Thread 22448 started
-Thread 26984 started
-Thread 2720 started
-Thread 24260 finished: [3304]
-Thread 15996 started
-Thread 22448 finished: [8221]
-Thread 12316 started
-Thread 15996 finished: [14038]
-Thread 15264 started
-Thread 2720 finished: [26849]
-Thread 32280 finished: [3304, 8221]
-Thread 15872 started
-Thread 26448 finished: [14038, 26849]
-Thread 27792 started
-Thread 15264 finished: [21362]
-Thread 15872 finished: [1509]
-Thread 12316 finished: [7856]
-Thread 29312 finished: [3304, 8221, 14038, 26849]
-Thread 26984 finished: [7856, 21362]
-Thread 27792 finished: [6367]
-Thread 29384 finished: [1509, 6367]
-Thread 31452 finished: [1509, 6367, 7856, 21362]
-Thread 14948 finished: [1509, 3304, 6367, 7856, 8221, 14038, 21362, 26849]
->>>>>>> 7e05b69488a9c1242495ba5c2c9ba61243e7b6e9
+Thread 3524 finished: [3304]
+Thread 1412 started
+Thread 19008 started
+Thread 19008 finished: [1509]
+Thread 4028 started
+Thread 4028 finished: [26849]
+Thread 3524 started
+Thread 3524 finished: [8221]
+Thread 7072 started
+Thread 7072 finished: [7856]
+Thread 4028 started
+Thread 4028 finished: [14038]
+Thread 19008 started
+Thread 19008 finished: [6367]
+Thread 7072 started
+Thread 7072 finished: [21362]
+Thread 1412 finished: [7856, 21362]
+Thread 6600 finished: [3304, 8221]
+Thread 15120 finished: [1509, 6367]
+Thread 15600 finished: [1509, 6367, 7856, 21362]
+Thread 4268 finished: [14038, 26849]
+Thread 2280 finished: [3304, 8221, 14038, 26849]
+Thread 6924 finished: [1509, 3304, 6367, 7856, 8221, 14038, 21362, 26849]

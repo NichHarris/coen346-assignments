@@ -17,9 +17,9 @@ class FileManager:
         # initialize the output file for writing
         self.output = open("output.txt", "w")
 
-    def merge(self, left_arr, right_arr):
-        # keep track of active threads in merge()
-        # print("in merge: {}".format(threading.active_count()))
+    def merge_sort(self, left_arr, right_arr):
+        # keep track of active threads in merge_sort()
+        # print("in merge_sort: {}".format(threading.active_count()))
 
         # pointers for traversing the two sublists (left_arr and right_arr)
         left = right = 0
@@ -47,17 +47,17 @@ class FileManager:
         result += left_arr[left:]
         result += right_arr[right:]
 
-        # write the status of the currently running thread (finished after exiting merge()) to output.txt
+        # write the status of the currently running thread (finished after exiting merge_sort()) to output.txt
         self.output.write("Thread {} finished: {}\n".format(threading.current_thread().ident, result))
         # return the resulting sorted list
         return result
 
     # recursively divide the list into sublists
-    def merge_sort(self, arr: list):
+    def splitting(self, arr: list):
         # write the status of the currently running thread (started after entering the 
-        # merge_sort function) to output.txt
+        # splitting function) to output.txt
         self.output.write("Thread {} started\n".format(threading.current_thread().ident))
-        # keep track of active threads in merge_sort()
+        # keep track of active threads in splitting()
         # print(threading.active_count())s
         # if the sublist contains more than one element, continue splitting recursively
         if len(arr) > 1:
@@ -67,10 +67,10 @@ class FileManager:
             with ThreadPoolExecutor(max_workers = 15) as executor:
                 # execute a thread for both the left and right portion of the split list
                 # NOTE: arr[:mid] will only return the sublist from index 0 to mid-1
-                left_arr = executor.submit(self.merge_sort, arr[:mid])
-                right_arr = executor.submit(self.merge_sort, arr[mid:])
+                left_arr = executor.submit(self.splitting, arr[:mid])
+                right_arr = executor.submit(self.splitting, arr[mid:])
             # exit the list to allow result collection and begin merging the sub lists
-            return self.merge(left_arr, right_arr)
+            return self.merge_sort(left_arr, right_arr)
         # base case for the recursive algorithm
         # return the list containing a single element
         else:
@@ -94,6 +94,6 @@ if __name__ == '__main__':
         values.append(int(line.strip('\n')))
 
     # sort the list of integers using recursive multithreading
-    result = FileManager().merge_sort(values)
+    result = FileManager().splitting(values)
     # print the sorted list to console
     print(result)
