@@ -77,7 +77,7 @@ class FileManager:
             self.output.write("Thread {} finished: {}\n".format(threading.current_thread().ident, arr))
             return arr
 
-# program driver
+# main point of script execution
 if __name__ == '__main__':
 
     # open input.txt and read each line

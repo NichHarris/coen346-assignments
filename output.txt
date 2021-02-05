@@ -1,40 +1,30 @@
-<<<<<<< HEAD
-Thread 31512 started
-Thread 21700 started
-Thread 4960 started
-Thread 31668 started
-Thread 1572 started
-Thread 11476 started
-Thread 26164 started
-=======
-Thread 23184 started
-Thread 22072 started
-Thread 10032 started
-Thread 16372 started
-Thread 32240 started
-Thread 12364 started
-Thread 9368 started
-Thread 32560 started
-Thread 21816 started
-Thread 26996 started
-Thread 32560 finished: [3304]
-Thread 28704 started
-Thread 21816 finished: [8221]
-Thread 1456 started
-Thread 9240 started
-Thread 908 started
-Thread 28704 finished: [14038]
-Thread 11920 started
-Thread 26996 finished: [26849]
-Thread 1456 finished: [1509]
-Thread 9240 finished: [6367]
-Thread 12364 finished: [1509, 6367]
-Thread 11920 finished: [21362]
-Thread 32240 finished: [14038, 26849]
-Thread 16372 finished: [3304, 8221]
-Thread 22072 finished: [3304, 8221, 14038, 26849]
-Thread 908 finished: [7856]
-Thread 9368 finished: [7856, 21362]
-Thread 10032 finished: [1509, 6367, 7856, 21362]
-Thread 23184 finished: [1509, 3304, 6367, 7856, 8221, 14038, 21362, 26849]
->>>>>>> bigchungo
+Thread 14948 started
+Thread 29312 started
+Thread 31452 started
+Thread 32280 started
+Thread 26448 started
+Thread 24260 started
+Thread 29384 started
+Thread 22448 started
+Thread 26984 started
+Thread 2720 started
+Thread 24260 finished: [3304]
+Thread 15996 started
+Thread 22448 finished: [8221]
+Thread 12316 started
+Thread 15996 finished: [14038]
+Thread 15264 started
+Thread 2720 finished: [26849]
+Thread 32280 finished: [3304, 8221]
+Thread 15872 started
+Thread 26448 finished: [14038, 26849]
+Thread 27792 started
+Thread 15264 finished: [21362]
+Thread 15872 finished: [1509]
+Thread 12316 finished: [7856]
+Thread 29312 finished: [3304, 8221, 14038, 26849]
+Thread 26984 finished: [7856, 21362]
+Thread 27792 finished: [6367]
+Thread 29384 finished: [1509, 6367]
+Thread 31452 finished: [1509, 6367, 7856, 21362]
+Thread 14948 finished: [1509, 3304, 6367, 7856, 8221, 14038, 21362, 26849]
