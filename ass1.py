@@ -4,58 +4,95 @@
 # Nicholas Harris 40111093
 # Benjamin Grant 40059608
 #
-# Merge-sort using multithreading
+# Merge-sort using recursive multithreading
 
+# import the necessarily packages
 import threading
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
-def merge(left_arr, right_arr, futures, output):
-    left = right = 0
-    result = []
-    print("{}\n".format(left_arr.result()))
-    print("{}\n".format(right_arr.result()))
-    while left < len(left_arr) and right < len(right_arr):
-        if left_arr[left] <= right_arr[right]:
-            result.append(left_arr[left])
-            left += 1
-        else:
-            result.append(right_arr[right])
-            right += 1
-    result += left_arr[left:].result()
-    output.write("Thread {} finished: {}\n".format(threading.current_thread().ident, left_arr[left:]))
-    result += right_arr[right:].result()
-    output.write("Thread {} finished: {}\n".format(threading.current_thread().ident, right_arr[right:]))
-    return result
+# FileManager class used to write to output.txt without having to pass it as an argument to merge() and merge_sort()
+class FileManager:
 
+    def __init__(self):
+        # initialize the output file for writing
+        self.output = open("output.txt", "w")
 
-def merge_sort(arr: list, futures, output):
-    #print(threading.active_count())  # keep track of threads
-    if len(arr) <= 1:
-        return arr
-    else:
-        with ThreadPoolExecutor(max_workers = 25) as executor:  # start multithreading
+    def merge(self, left_arr, right_arr):
+        # keep track of active threads in merge()
+        print("in merge: {}".format(threading.active_count()))
+
+        # pointers for traversing the two sublists (left_arr and right_arr)
+        left = right = 0
+        # list to store sorted result
+        result = []
+        
+        # terminate the active threads and return the resulting sublists
+        left_arr = left_arr.result()
+        right_arr = right_arr.result()
+
+        # begin merging the two sublists in ascending order using the left and right pointers
+        while left < len(left_arr) and right < len(right_arr):
+            # if the element in left_arr currently indexed is smaller than that of right_arr,
+            # append the element to result and increment the left pointer
+            if left_arr[left] <= right_arr[right]:
+                result.append(left_arr[left])
+                left += 1
+            # if the element in right_arr currently indexed is smaller,
+            # append the element to result and increment the right pointer
+            else:
+                result.append(right_arr[right])
+                right += 1
+
+        # append the remaining elements in result if they are already ordered
+        result += left_arr[left:]
+        result += right_arr[right:]
+
+        # write the status of the currently running thread (finished after exiting merge()) to output.txt
+        self.output.write("Thread {} finished: {}\n".format(threading.current_thread().ident, result))
+        # return the resulting sorted list
+        return result
+
+    # recursively divide the list into sublists
+    def merge_sort(self, arr: list):
+        # write the status of the currently running thread (started after entering the 
+        # merge_sort function) to output.txt
+        self.output.write("Thread {} started\n".format(threading.current_thread().ident))
+        # keep track of active threads in merge_sort()
+        print(threading.active_count())
+        # if the sublist contains more than one element, continue splitting recursively
+        if len(arr) > 1:
+            # get the mid pointer for splitting lists
             mid = len(arr)//2
-            left_arr = executor.submit(merge_sort, arr[:mid], futures, output)  # schedules a callable
-            futures.append(left_arr)  # add result to list
-            right_arr = executor.submit(merge_sort, arr[mid:], futures, output)  # schedules a callable
-            futures.append(right_arr)  # add result to list
-            output.write("Thread {} started\n".format(threading.current_thread().ident))
-            return merge(left_arr, right_arr, futures, output)
+            # instantiate a ThreadPoolExecutor to submit threads and terminate threads upon completion
+            with ThreadPoolExecutor(max_workers = 15) as executor:
+                # execute a thread for both the left and right portion of the split list
+                left_arr = executor.submit(self.merge_sort, arr[:mid])
+                right_arr = executor.submit(self.merge_sort, arr[mid:])
+            # exit the list to allow result collection and begin merging the sub lists
+            return self.merge(left_arr, right_arr)
+        # base case for the recursive algorithm
+        # return the list containing a single element
+        else:
+            # write the status of the currently running thread (finished after returning from base case) to output.txt
+            self.output.write("Thread {} finished: {}\n".format(threading.current_thread().ident, arr))
+            return arr
 
+# program driver
 if __name__ == '__main__':
-    # open input.txt and read the lines
+
+    # open input.txt and read each line
     with open('input.txt', 'r') as file:
         lines = file.readlines()
+
+    # close the file
     file.close()
 
-    # create a list of integers
+    # create a list of integers from the lines read
     values = []
     for i in range(len(lines)):
         values.append(int(lines[i].strip('\n')))
-    
-    # open the output file
-    output = open("output.txt", "w")
 
-    futures = []
-    merge_sort(values, futures, output)
-
+    # sort the list of integers using recursive multithreading
+    result = FileManager().merge_sort(values)
+    # print the sorted list to console
+    print(result)
