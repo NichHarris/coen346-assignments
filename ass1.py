@@ -8,7 +8,7 @@
 
 # import the necessarily packages
 import threading
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor
 
 # FileManager class used to write to output.txt without having to pass it as an argument to merge() and merge_sort()
 class FileManager:
