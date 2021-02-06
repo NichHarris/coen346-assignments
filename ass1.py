@@ -4,7 +4,7 @@
 # Nicholas Harris 40111093
 # Benjamin Grant 40059608
 #
-# Merge-sort using recursive multithreading
+# Recursive merge sort using multithreading
 
 # import the necessarily packages
 import threading
