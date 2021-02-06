@@ -21,8 +21,8 @@ class FileManager:
         # keep track of active threads in merge_sort()
         # print("in merge_sort: {}".format(threading.active_count()))
 
-        # pointers for traversing the two sublists (left_arr and right_arr)
-        left = right = 0
+        # left and right pointers for traversing the two sublists (left_arr and right_arr)
+        lp = rp = 0
         # list to store sorted result
         result = []
         
@@ -31,21 +31,23 @@ class FileManager:
         right_arr = right_arr.result()
 
         # begin merging the two sublists in ascending order using the left and right pointers
-        while left < len(left_arr) and right < len(right_arr):
-            # if the element in left_arr currently indexed is smaller than that of right_arr,
-            # append the element to result and increment the left pointer
-            if left_arr[left] <= right_arr[right]:
-                result.append(left_arr[left])
-                left += 1
-            # if the element in right_arr currently indexed is smaller,
-            # append the element to result and increment the right pointer
+        while lp < len(left_arr) and rp < len(right_arr):
+            # append the smallest element between the left and right sublists to the result list
+            result.append(min(left_arr[lp], right_arr[rp]))
+            # if the left element is contained in the list already then increament lp
+            # else increment rp
+            # if result[len(result)-1] == left_arr[lp]:
+            # ^^^^^ alternative implementation
+            if result.count(left_arr[lp]) >= 1:
+                lp +=1
             else:
-                result.append(right_arr[right])
-                right += 1
+                rp +=1            
 
         # append the remaining elements in result if they are already ordered
-        result += left_arr[left:]
-        result += right_arr[right:]
+        if lp == len(left_arr):
+            result += right_arr[rp:]
+        else:
+            result += left_arr[lp:]
 
         # write the status of the currently running thread (finished after exiting merge_sort()) to output.txt
         self.output.write("Thread {} finished: {}\n".format(threading.current_thread().ident, result))
@@ -61,7 +63,7 @@ class FileManager:
         # print(threading.active_count())s
         # if the sublist contains more than one element, continue splitting recursively
         if len(arr) > 1:
-            # get the mid pointer for splitting lists
+            # get the mid pointer for splitting lists (// returns the floor of the operation)
             mid = len(arr)//2
             # instantiate a ThreadPoolExecutor to submit threads and terminate threads upon completion
             with ThreadPoolExecutor(max_workers = 15) as executor:
