@@ -61,7 +61,7 @@ class FileManager:
         # print(threading.active_count())s
         # if the sublist contains more than one element, continue splitting recursively
         if len(arr) > 1:
-            # get the floor of the mid pointer for splitting lists
+            # get the mid pointer for splitting lists
             mid = len(arr)//2
             # instantiate a ThreadPoolExecutor to submit threads and terminate threads upon completion
             with ThreadPoolExecutor(max_workers = 15) as executor:
