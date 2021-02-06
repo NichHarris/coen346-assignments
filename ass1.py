@@ -36,14 +36,15 @@ class FileManager:
             result.append(min(left_arr[lp], right_arr[rp]))
             # if the left element is contained in the list already then increament lp
             # else increment rp
-            # if result[len(result)-1] == left_arr[lp]:
+
+            # if result.count(left_arr[lp]) >= 1:
             # ^^^^^ alternative implementation
-            if result.count(left_arr[lp]) >= 1:
+            if result[len(result)-1] == left_arr[lp]:
                 lp +=1
             else:
                 rp +=1            
 
-        # append the remaining elements in result if they are already ordered
+        # append the remaining elements in result depending on if the end of left or right was reached
         if lp == len(left_arr):
             result += right_arr[rp:]
         else:
