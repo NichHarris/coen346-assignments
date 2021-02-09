@@ -33,18 +33,16 @@ class FileManager:
         # begin merging the two sublists in ascending order using the left and right pointers
         while lp < len(left_arr) and rp < len(right_arr):
             # append the smallest element between the left and right sublists to the result list
-            result.append(min(left_arr[lp], right_arr[rp]))
-            # if the left element is contained in the list already then increament lp
-            # else increment rp
-
-            # if result.count(left_arr[lp]) >= 1:
-            # ^^^^^ alternative implementation
-            if result[len(result)-1] == left_arr[lp]:
-                lp +=1
+            min_val = min(left_arr[lp], right_arr[rp])
+            result.append(min_val)
+            
+            # increment respective pointer if the newly added element is in left or right sublist
+            if min_val == left_arr[lp]:
+                lp += 1
             else:
-                rp +=1            
+                rp +=1        
 
-        # append the remaining elements in result depending on if the end of left or right was reached
+        # append the remaining elements to result depending on if the end of left or right sublists was reached
         if lp == len(left_arr):
             result += right_arr[rp:]
         else:
