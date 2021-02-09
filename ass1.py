@@ -6,17 +6,18 @@
 #
 # Recursive merge sort using multithreading
 
-# import the necessarily packages
+# import the necessary packages
 import threading
 from concurrent.futures import ThreadPoolExecutor
 
-# FileManager class used to write to output.txt without having to pass it as an argument to merge() and merge_sort()
+# class used to write to output.txt without having to pass it as an argument to merge() and merge_sort()
 class FileManager:
 
+    # initialize the output file for writing
     def __init__(self):
-        # initialize the output file for writing
         self.output = open("output.txt", "w")
 
+    # sort and merge the sublists
     def merge_sort(self, left_arr, right_arr):
         # keep track of active threads in merge_sort()
         # print("in merge_sort: {}".format(threading.active_count()))
