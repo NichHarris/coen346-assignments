@@ -20,20 +20,51 @@ class Scheduler:
     def __init__(self, quant: int):
         self.output = open("output.txt", "w")
 
+# class used to represent processes
 class Process:
 
+    # default cosntructor
     def __init__(self, user: str, quant: int, ready_t: int, service_t: int):
-        self.user_id = user
+        self._user_id = user
         # amount of quantum time allocated to process
-        self.quantum = quant
+        self._quantum = quant
         # time at which the process is ready to be executed
-        self.ready_time = ready_t
+        self._ready_time = ready_t
         # time left until process completes its execution
-        self.time_left = service_t
+        self._time_left = service_t
         # type of event state -> 1: started, 2: resumed, 3: paused, 4: finished
-        self.state = None
+        self._state = None
     
-    
+    """ Getters """
+    @property
+    def user_id(self):
+        return self._user_id
+
+    @property
+    def quantum(self):
+        return self._quantum
+
+    @property
+    def ready_time(self):
+        return self._ready_time
+
+    @property
+    def time_left(self):
+        return self._time_left
+
+    @property
+    def state(self):
+        return self._state
+
+    """ Setters """
+    @time_left.setter
+    def time_left(self, time):
+        self._time_left = time
+
+    @state.setter
+    def state(self, new_state):
+        self._state = new_state
+
 # entrypoint of script execution
 if __name__  == '__main__':
 
