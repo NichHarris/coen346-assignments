@@ -72,19 +72,17 @@ if __name__  == '__main__':
     with open('input.txt', 'r') as file:
         lines = file.readlines()
 
-    # get the time quantum (equally distributed across processes in program)
+    # get the time quantum of the program
     quant = int(lines.pop(0))
 
     # dictionary containing the user names and number of processes under each user
     user_dict = {}
-
-    # list containing the ready time for each process (time at which the process is ready)
+    # list containing the ready time for each process
     ready_time = []
-
-    # list containing the service time for each process (total CPU usage time needed for a process)
+    # list containing the service time for each process
     service_time = []
 
-    # get the characteristics of each process for each user
+    # store the user name and number of processes as well as each process' ready time and service time in their respective variables
     for line in lines:
         if line[0].isalpha():
             user_dict[line.split(" ")[0]] = int(line.split(" ")[1].rstrip())
