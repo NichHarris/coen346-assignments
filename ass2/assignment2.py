@@ -20,7 +20,7 @@ class Scheduler:
     def __init__(self, quant: int):
         self.output = open("output.txt", "w")
 
-# class used to represent processes
+# class used to encapsulate the specifications of each process
 class Process:
 
     # default cosntructor
