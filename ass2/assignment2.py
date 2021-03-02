@@ -8,37 +8,108 @@
 
 # import the necessary packages
 import threading
-from concurrent.futures import ThreadPoolExecutor
-
-# global dict used to get the name of each event state corresponding to a certain integer
-event_dict = {0: "Started", 1: "Resumed", 2: "Paused", 3: "Finished"}
+import time
 
 # class used to handle the fair-share process scheduling and write to output.txt
 class Scheduler:
 
-    # initialize the output file for writing
-    def __init__(self, quant: int):
-        self.output = open("output.txt", "w")
+    # default constructor
+    def __init__(self, processes: list):
+        # initialize the output file for writing
+        self._output = open("output.txt", "w")
+        # processes which have not yet reached their ready time
+        self._new_processes = processes
+        # queue of processes ready to be executed
+        # enqueue: .append(), dequeue: .pop(0)
+        self._ready_queue = []
+        # holds the elapsed time of the program
+        # TODO: fix the timer
+        self._total_elapsed_time = time.time()
+
+        while len(self._new_processes) or len(self._ready_queue):
+            if len(self._ready_queue) != 0:
+                # while there are processes waiting in the ready queue, dequeue a process and execute it using a single thread
+                t = threading.Thread(target=self.execute, args=(self._ready_queue.pop(0),))
+                t.start()
+                t.join()
+                print("thread completed")
+            elif len(self._new_processes) != 0:
+                self.verify_if_ready()
+                #print("process added to ready queue")
+                print(int(self._total_elapsed_time))
+
+    # adds a process to the ready queue if its ready to run
+    def verify_if_ready(self):
+        if self._new_processes[0].ready_time <= int(self._total_elapsed_time):
+            self._ready_queue.append(self._new_processes.pop(0))
+
+    # execute a process
+    def execute(self, process):
+        print("thread started")
+        # thread has started its execution
+        if process.state is None:
+            self._output.write(
+                "Time {}, User {}, Process {}, {}\n".format(
+                    int(self._total_elapsed_time), process.user_id,
+                    process.process_id,
+                    'Started'))
+        # paused thread has resumed execution
+        elif process.state is 'Paused':
+            process.state = 'Resumed'
+            self._output.write(
+                "Time {}, User {}, Process {}, {}\n".format(
+                    int(self._total_elapsed_time), process.user_id,
+                    process.process_id,
+                    'Resumed'))
+
+        #TODO: do we need to context switch if time left is 0 before sleep is completed?
+        time.sleep(process.quantum)
+        process.time_left = process.time_left - process.quantum
+
+        # if the process is finished executing, report the finished status to output
+        if process.time_left <= 0:
+            self._output.write(
+                "Time {}, User {}, Process {}, {}\n".format(
+                    int(self._total_elapsed_time), process.user_id,
+                    process.process_id,
+                    'Finished'))
+        # if the process needs more time to execute, set its state to 'Paused' and add it back to the ready queue
+        else:
+            process.state = 'Paused'
+            self._output.write(
+                "Time {}, User {}, Process {}, {}\n".format(
+                    int(self._total_elapsed_time), process.user_id,
+                    process.process_id,
+                    'Paused'))
+            self._ready_queue.append(process)
+
 
 # class used to encapsulate the specifications of each process
 class Process:
 
     # default cosntructor
-    def __init__(self, user: str, quant: int, ready_t: int, service_t: int):
+    def __init__(self, user: str, pid: int, quant: int, ready_t: int, service_t: int):
+        # user the process belongs to
         self._user_id = user
+        # process number
+        self._process_id = pid
         # amount of quantum time allocated to process
         self._quantum = quant
         # time at which the process is ready to be executed
         self._ready_time = ready_t
         # time left until process completes its execution
         self._time_left = service_t
-        # type of event state -> 1: started, 2: resumed, 3: paused, 4: finished
+        # process state
         self._state = None
     
     """ Getters """
     @property
     def user_id(self):
         return self._user_id
+
+    @property
+    def process_id(self):
+        return self._process_id
 
     @property
     def quantum(self):
@@ -110,5 +181,11 @@ if __name__  == '__main__':
     counter = 0  # counter used to traverse each previously generated list for process specifications
     for user in user_dict:
         for i in range(0, user_dict[user]):
-            processes.append(Process(user,quant_alloc[counter],ready_time[counter],service_time[counter]))
+            processes.append(Process(user, i, quant_alloc[counter], ready_time[counter], service_time[counter]))
             counter += 1
+
+    # sort the processes list by ready time in ascending order (to be used as a queue)
+    processes.sort(key = lambda x: x.ready_time, reverse = False)
+
+    # run the scheduler
+    Scheduler(processes)
