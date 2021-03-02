@@ -40,7 +40,7 @@ class Scheduler:
                 t.join()
                 print("thread completed")
 
-    # adds a process to the ready queue if its ready to run
+    # add a process to the ready queue if its ready to run
     def verify_if_ready(self):
         if len(self._new_processes) != 0:
             if self._new_processes[0].ready_time <= int(self._total_elapsed_time):
