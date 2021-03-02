@@ -17,31 +17,34 @@ class Scheduler:
     def __init__(self, processes: list):
         # initialize the output file for writing
         self._output = open("output.txt", "w")
-        # processes which have not yet reached their ready time
+        # queue of processes which have not yet reached their ready time
+        # enqueue: .append(), dequeue: .pop(0)
         self._new_processes = processes
         # queue of processes ready to be executed
         # enqueue: .append(), dequeue: .pop(0)
         self._ready_queue = []
         # holds the elapsed time of the program
-        # TODO: fix the timer
-        self._total_elapsed_time = time.time()
+        self._total_elapsed_time = time.clock()
 
+        # check if a new process needs to be added to ready queue and/or execute a process in the ready queue
         while len(self._new_processes) or len(self._ready_queue):
+            # update the elapsed time
+            self._total_elapsed_time = time.clock()
+            # check if a new process is ready to be executed
+            self.verify_if_ready()
+            print(int(self._total_elapsed_time))
+            # while there are processes waiting in the ready queue, dequeue a process and execute it using a single thread
             if len(self._ready_queue) != 0:
-                # while there are processes waiting in the ready queue, dequeue a process and execute it using a single thread
                 t = threading.Thread(target=self.execute, args=(self._ready_queue.pop(0),))
                 t.start()
                 t.join()
                 print("thread completed")
-            elif len(self._new_processes) != 0:
-                self.verify_if_ready()
-                #print("process added to ready queue")
-                print(int(self._total_elapsed_time))
 
     # adds a process to the ready queue if its ready to run
     def verify_if_ready(self):
-        if self._new_processes[0].ready_time <= int(self._total_elapsed_time):
-            self._ready_queue.append(self._new_processes.pop(0))
+        if len(self._new_processes) != 0:
+            if self._new_processes[0].ready_time <= int(self._total_elapsed_time):
+                self._ready_queue.append(self._new_processes.pop(0))
 
     # execute a process
     def execute(self, process):
