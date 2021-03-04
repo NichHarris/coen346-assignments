@@ -10,6 +10,7 @@
 import threading
 import time
 
+
 # class used to handle the fair-share process scheduling and write to output.txt
 class Scheduler:
 
@@ -24,12 +25,14 @@ class Scheduler:
         # enqueue: .append(), dequeue: .pop(0)
         self._ready_queue = []
         # holds the elapsed time of the program
-        self._total_elapsed_time = time.clock()
+        self._total_elapsed_time = time.perf_counter()
+        # holds (key) current active user(s) and (value) the number of active process(es) of the user(s)
+        self.users_dict = {}
 
         # check if a new process needs to be added to ready queue and/or execute a process in the ready queue
         while len(self._new_processes) or len(self._ready_queue):
             # update the elapsed time
-            self._total_elapsed_time = time.clock()
+            self._total_elapsed_time = time.perf_counter()
             # check if a new process is ready to be executed
             self.verify_if_ready()
             print(int(self._total_elapsed_time))
@@ -44,7 +47,22 @@ class Scheduler:
     def verify_if_ready(self):
         if len(self._new_processes) != 0:
             if self._new_processes[0].ready_time <= int(self._total_elapsed_time):
+
+                # adds a new user to dict, and increments existing users with a new process
+                key = self._new_processes[0].user_id
+                if key in self.users_dict.keys():
+                    self.users_dict[key] += 1
+                else:
+                    self.users_dict[key] = 1
+
                 self._ready_queue.append(self._new_processes.pop(0))
+                self.quantum_alloc()
+
+    def quantum_alloc(self):
+        for process in self._ready_queue:
+            new_quant = int(self.info[0] // len(self.users_dict) // self.users_dict[process.user_id])
+            process.set_quant(new_quant)
+            print("Quantum: " + process.quantum)
 
     # execute a process
     def execute(self, process):
@@ -56,8 +74,13 @@ class Scheduler:
                     int(self._total_elapsed_time), process.user_id,
                     process.process_id,
                     'Started'))
+            self._output.write(
+                "Time {}, User {}, Process {}, {}\n".format(
+                    int(self._total_elapsed_time), process.user_id,
+                    process.process_id,
+                    'Resumed'))
         # paused thread has resumed execution
-        elif process.state is 'Paused':
+        elif process.state == 'Paused':
             process.state = 'Resumed'
             self._output.write(
                 "Time {}, User {}, Process {}, {}\n".format(
@@ -65,7 +88,7 @@ class Scheduler:
                     process.process_id,
                     'Resumed'))
 
-        #TODO: do we need to context switch if time left is 0 before sleep is completed?
+        # TODO: do we need to context switch if time left is 0 before sleep is completed?
         time.sleep(process.quantum)
         process.time_left = process.time_left - process.quantum
 
@@ -76,36 +99,41 @@ class Scheduler:
                     int(self._total_elapsed_time), process.user_id,
                     process.process_id,
                     'Finished'))
+            # decrement the number of running processes for the user
+            self.users_dict[process.user_id] -= 1
+            self.quantum_alloc()
         # if the process needs more time to execute, set its state to 'Paused' and add it back to the ready queue
+
         else:
             process.state = 'Paused'
             self._output.write(
-                "Time {}, User {}, Process {}, {}\n".format(
-                    int(self._total_elapsed_time), process.user_id,
-                    process.process_id,
-                    'Paused'))
+                "{} :Time {}, User {}, Process {}, {}\n".format(process.quantum,
+                                                                int(self._total_elapsed_time), process.user_id,
+                                                                process.process_id,
+                                                                'Paused'))
             self._ready_queue.append(process)
 
 
 # class used to encapsulate the specifications of each process
 class Process:
 
-    # default cosntructor
-    def __init__(self, user: str, pid: int, quant: int, ready_t: int, service_t: int):
+    # default constructor
+    def __init__(self, user: str, pid: int, ready_t: int, service_t: int):
         # user the process belongs to
         self._user_id = user
         # process number
         self._process_id = pid
         # amount of quantum time allocated to process
-        self._quantum = quant
+        self._quantum = 0
         # time at which the process is ready to be executed
         self._ready_time = ready_t
         # time left until process completes its execution
         self._time_left = service_t
         # process state
         self._state = None
-    
+
     """ Getters """
+
     @property
     def user_id(self):
         return self._user_id
@@ -131,6 +159,7 @@ class Process:
         return self._state
 
     """ Setters """
+
     @time_left.setter
     def time_left(self, time):
         self._time_left = time
@@ -139,8 +168,12 @@ class Process:
     def state(self, new_state):
         self._state = new_state
 
+    def set_quant(self, new_quant):
+        self._quantum = new_quant
+
+
 # entrypoint of script execution
-if __name__  == '__main__':
+if __name__ == '__main__':
 
     # open input.txt and read file content
     with open('input.txt', 'r') as file:
@@ -167,28 +200,31 @@ if __name__  == '__main__':
     # close the file
     file.close()
 
-    # list for the allocation of time quantums
+    # list for the allocation of time quantum
     quant_alloc = []
 
-    # find the amount of the time quantum allocated to each process
-    num_users = len(user_dict) # number of users
-    for key in user_dict:
-        num_user_processes = user_dict[key]
-        for i in range(0, num_user_processes):
-            quant_alloc.append(int(quant//num_users//num_user_processes))
+
+    # # TODO: This is wrong, we can't assign the quantum automatically, we have to calculate it based on the processes that are READY
+    # # find the amount of the time quantum allocated to each process
+    # num_users = len(user_dict)  # number of users
+    # for key in user_dict:
+    #     num_user_processes = user_dict[key]
+    #     for i in range(0, num_user_processes):
+    #         quant_alloc.append(int(quant // num_users // num_user_processes))
 
     # array of Process objects to be executed
     processes = []
 
+    # program_info = [quant, num_users, num_user_processes]
     # generate a Process object and add it to the list of processes
     counter = 0  # counter used to traverse each previously generated list for process specifications
     for user in user_dict:
         for i in range(0, user_dict[user]):
-            processes.append(Process(user, i, quant_alloc[counter], ready_time[counter], service_time[counter]))
+            processes.append(Process(user, i, ready_time[counter], service_time[counter]))
             counter += 1
 
     # sort the processes list by ready time in ascending order (to be used as a queue)
-    processes.sort(key = lambda x: x.ready_time, reverse = False)
+    processes.sort(key=lambda x: x.ready_time, reverse=False)
 
     # run the scheduler
     Scheduler(processes)
