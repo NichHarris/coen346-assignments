@@ -31,6 +31,7 @@ class Scheduler:
         # holds quantum value
         self.quantum = m_quantum
 
+        self.time_start = 0
         # check if a new process needs to be added to ready queue and/or execute a process in the ready queue
         while len(self._new_processes) or len(self._ready_queue):
             # update the elapsed time
@@ -76,30 +77,38 @@ class Scheduler:
         if process.state is None:
             self.print_to_file(process, 'Started')
             self.print_to_file(process, 'Resumed')
+            self.time_start = time.perf_counter()
         # paused thread has resumed execution
         elif process.state == 'Paused':
             process.state = 'Resumed'
             self.print_to_file(process, 'Resumed')
+            self.time_start = time.perf_counter()
 
-        # sleep thread for the length of the process' quantum, or remaining time
-        if process.quantum >= process.time_left:
-            time.sleep(process.time_left)
-        else:
-            time.sleep(process.quantum)
-        # update process' remaining time
-        process.time_left = process.time_left - process.quantum
-
-        # update the elapsed time
-        self._total_elapsed_time = time.perf_counter()
-        # check if any other processes became ready
-        self.verify_if_ready()
+            # # sleep thread for the length of the process' quantum, or remaining time
+            # if process.quantum >= process.time_left:
+            #     time.sleep(process.time_left)
+            # else:
+            #     time.sleep(process.quantum)
+            # update process' remaining time
+            # process.time_left = process.time_left - process.quantum
+        while True:
+            # update the elapsed time
+            self._total_elapsed_time = time.perf_counter()
+            # check if any other processes became ready
+            self.verify_if_ready()
+            if self._total_elapsed_time - self.time_start >= process.quantum:
+                process.time_left = process.time_left - process.quantum
+                break
+            elif self._total_elapsed_time - self.time_start >= process.time_left:
+                process.time_left = process.time_left - process.quantum
+                break
 
         # if the process is finished executing, report the finished status to output
         if process.time_left <= 0:
             self.print_to_file(process, 'Paused')
             self.print_to_file(process, 'Finished')
 
-            # decrement the number of running processes for the user
+            # decrement the number of running processes for the users_dict
             self.users_dict[process.user_id] -= 1
             if self.users_dict[process.user_id] == 0:
                 self.users_dict.pop(process.user_id)
