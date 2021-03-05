@@ -30,8 +30,9 @@ class Scheduler:
         self.users_dict = {}
         # holds quantum value
         self.quantum = m_quantum
-
+        # holds the time where a process starts/resumes running
         self.time_start = 0
+
         # check if a new process needs to be added to ready queue and/or execute a process in the ready queue
         while len(self._new_processes) or len(self._ready_queue):
             # update the elapsed time
@@ -41,7 +42,6 @@ class Scheduler:
             print(int(self._total_elapsed_time))
             # while there are processes waiting in the ready queue, dequeue a process and execute it using a single thread
             if len(self._ready_queue) != 0:
-                self._ready_queue[0].print_process()
                 t = threading.Thread(target=self.execute, args=(self._ready_queue.pop(0),))
                 t.start()
                 t.join()
@@ -84,18 +84,13 @@ class Scheduler:
             self.print_to_file(process, 'Resumed')
             self.time_start = time.perf_counter()
 
-            # # sleep thread for the length of the process' quantum, or remaining time
-            # if process.quantum >= process.time_left:
-            #     time.sleep(process.time_left)
-            # else:
-            #     time.sleep(process.quantum)
-            # update process' remaining time
-            # process.time_left = process.time_left - process.quantum
         while True:
             # update the elapsed time
             self._total_elapsed_time = time.perf_counter()
             # check if any other processes became ready
             self.verify_if_ready()
+            # break out of loop if time quantum is used up or process is finished
+            # done in if-elif instead of 'or' for easier readability
             if self._total_elapsed_time - self.time_start >= process.quantum:
                 process.time_left = process.time_left - process.quantum
                 break
@@ -110,6 +105,7 @@ class Scheduler:
 
             # decrement the number of running processes for the users_dict
             self.users_dict[process.user_id] -= 1
+            # remove a user from users_dict if it has no more processes
             if self.users_dict[process.user_id] == 0:
                 self.users_dict.pop(process.user_id)
             # update remaining processes quantum
@@ -118,6 +114,7 @@ class Scheduler:
         else:
             process.state = 'Paused'
             self.print_to_file(process, 'Paused')
+            # Send paused process to back of ready_queue
             self._ready_queue.append(process)
 
     # print output message to file
@@ -185,13 +182,6 @@ class Process:
 
     def set_quantum(self, new_quantum):
         self._quantum = new_quantum
-
-    """ Testing Prints """
-
-    def print_process(self):
-        print("Process info: User: " + str(self.user_id) + " Process: " + str(self.process_id) + " Quantum: " + str(
-            self.quantum) + " Ready Time: " + str(self.ready_time) + " Time Left: " + str(
-            self.time_left) + " State: " + str(self.state))
 
 
 # entrypoint of script execution
