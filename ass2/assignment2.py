@@ -62,7 +62,9 @@ class Scheduler:
                     self._ready_queue.append(process)
                     # remove process from new_processes queue
                     self._new_processes.pop(0)
-        self.quantum_alloc()
+                else:
+                    break
+            self.quantum_alloc()
 
     # update the quantum of each process remaining in the ready queue
     def quantum_alloc(self):
