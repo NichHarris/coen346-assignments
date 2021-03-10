@@ -45,6 +45,8 @@ class Scheduler:
                 t.start()
                 t.join()
 
+        self._output.close()
+
     # add a process to the ready queue if its ready to run
     def verify_if_ready(self):
         if len(self._new_processes) != 0:
@@ -72,7 +74,6 @@ class Scheduler:
 
     # execute a process
     def execute(self, process):
-        print("thread started")
         # thread has started its execution
         if process.state is None:
             self.print_to_file(process, 'Started')
