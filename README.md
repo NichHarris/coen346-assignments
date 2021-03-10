@@ -1,8 +1,8 @@
 # COEN 346
 Assignments for COEN346 - W2021
 
-Matthew Sklivas 40095150
+Matthew Sklivas 
 
-Nicholas Harris 40111093
+Nicholas Harris
 
-Benjamin Grant 40059608
+Benjamin Grant
