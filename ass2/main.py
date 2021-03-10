@@ -41,8 +41,9 @@ if __name__ == '__main__':
     # array of Process objects to be executed
     processes = []
 
+    # counter used to traverse each previously generated list for process specifications
+    counter = 0 
     # generate a Process object and add it to the list of processes
-    counter = 0  # counter used to traverse each previously generated list for process specifications
     for user in user_dict:
         for i in range(0, user_dict[user]):
             processes.append(Process(user, i, ready_time[counter], service_time[counter]))
