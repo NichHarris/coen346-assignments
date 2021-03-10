@@ -39,13 +39,11 @@ class Scheduler:
             self._total_elapsed_time = time.perf_counter()
             # check if any new processes are ready to be executed
             self.verify_if_ready()
-            print(int(self._total_elapsed_time))
             # while there are processes waiting in the ready queue, dequeue a process and execute it using a single thread
             if len(self._ready_queue) != 0:
                 t = threading.Thread(target=self.execute, args=(self._ready_queue.pop(0),))
                 t.start()
                 t.join()
-                print("thread completed")
 
     # add a process to the ready queue if its ready to run
     def verify_if_ready(self):
