@@ -13,7 +13,7 @@ if __name__ == '__main__':
 
     # open memconfig.txt and read file content
     with open('memconfig.txt', 'r') as mem_config:
-        num_pages = mem_config.readlines()
+        cfg = mem_config.readlines()
     # open processes.txt and read file content
     with open('processes.txt', 'r') as proc_file:
         proc_lines = proc_file.readlines()
@@ -27,6 +27,8 @@ if __name__ == '__main__':
     num_cores = int(proc_lines.pop(0))
     # contains number of processes
     num_processes = int(proc_lines.pop(0))
+    # contains number of memory pages
+    num_pages = int(cfg.pop(0))
     # list containing start time of each process
     ready_time = []
     # list containing the service time for each process
