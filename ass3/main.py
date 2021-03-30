@@ -7,6 +7,10 @@
 # Virtual Memory Management Simulation
 
 # import the necessary packages
+from clock import Clock
+from scheduler import Scheduler
+import time
+import threading
 
 # entrypoint of script execution
 if __name__ == '__main__':
@@ -21,7 +25,7 @@ if __name__ == '__main__':
     with open('commands.txt', 'r') as cmd_file:
         commands = cmd_file.readlines()
 
-    # dictionary containing the commands
+    # list containing the commands
     command_list = []
     # contains number of cores to use
     num_cores = int(proc_lines.pop(0))
@@ -54,6 +58,35 @@ if __name__ == '__main__':
     mem_config.close()
     proc_file.close()
     cmd_file.close()
+
+    thread_list = []
+    # create clock thread
+    # TODO: Check if this is working properly -> creating a single thread
+    t_clock = Clock()
+    # create scheduling thread
+    # TODO: Check if this is working properly -> creating a single thread
+    t_sched = Scheduler()
+
+    print(threading.activeCount())
+
+    # start clock thread
+    t_clock.start()
+    # start scheduler thread
+    t_sched.start()
+
+    print(threading.activeCount())
+
+    # append threads to thread_list
+    thread_list.append(t_clock)
+    thread_list.append(t_sched)
+
+    # signal for clock and scheduler to stop running
+    t_clock.set_terminate(True)
+    t_sched.set_terminate(True)
+
+    # join all threads
+    for t in thread_list:
+        t.join()
 
     # # counter used to traverse each previously generated list for process specifications
     # counter = 0
