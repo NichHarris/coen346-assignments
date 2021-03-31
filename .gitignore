@@ -1,1 +1,4 @@
 output.txt
+venv/
+ass3/__pycache__/
+.idea/misc.xml

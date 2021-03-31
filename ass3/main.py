@@ -35,7 +35,7 @@ if __name__ == '__main__':
     # contains number of memory pages
     num_pages = int(cfg.pop(0))
     # process dict
-    process_dict = {}
+    process_list = []
 
     # populate list of commands
     for command in commands:
@@ -49,12 +49,15 @@ if __name__ == '__main__':
 
     print(command_list)
 
-    # populate process_dict
-    id = 1
+    # populate process_list
+    proc_id = 1
     for process in proc_lines:
-        # key of process ready time and value tuple of service time and process id
-        process_dict[id] = (int(process.split(" ")[0]), int(process.split(" ")[1].rstrip()))
-        id += 1
+        # append tuple of id, ready time, and service time
+        process_list.append((proc_id, int(process.split(" ")[0]), int(process.split(" ")[1].rstrip())))
+        proc_id += 1
+
+    # sort by ready time
+    process_list.sort(key=lambda ready: ready[1])
 
     # close the files
     mem_config.close()
@@ -84,39 +87,16 @@ if __name__ == '__main__':
     # process thread creation
     while True:
         # starting a process thread
-        proc_id = 1
-        temp = 1
-        while len(process_dict) != 0:
-            cur_time = int(t_clock.get_time()/1000)
-            for i in process_dict.copy():
-                tup = process_dict[i]
-                if tup[0] == cur_time:
-                    t_proc = Process(t_clock, output, i, tup[0], tup[1])
-                    t_proc.start()
-                    thread_list.append(t_proc)
-                    proc_id = i
-                    break
-            process_dict.pop(proc_id)
-
+        cur_time = int(t_clock.get_time()/1000)
+        tuple = process_list[0]
+        if cur_time == tuple[1]:
+            t_proc = Process(t_clock, output, tuple[0], tuple[1], tuple[2])
+            t_proc.start()
+            thread_list.append(t_proc)
+            process_list.pop(0)
         # using this to break right now, eventually we want to break when theres no commands left
         if len(thread_list) == num_processes + 2:
             break
-
-    # # process thread creation
-    # while True:
-    #     cur_time = int(t_clock.get_time()/1000)
-    #     # starting a process thread
-    #     if cur_time in process_dict:
-    #         tup = process_dict[cur_time]
-    #         t_proc = Process(t_clock, output, tup[1], cur_time, tup[0])
-    #         t_proc.start()
-    #         thread_list.append(t_proc)
-    #         process_dict.pop(cur_time)
-    #
-    #     # using this to break right now, eventually we want to break when theres no commands left
-    #     if len(thread_list) == num_processes + 2:
-    #         break
-
 
     # print list of threads
     print(thread_list)
