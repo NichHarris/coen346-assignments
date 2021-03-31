@@ -82,6 +82,7 @@ if __name__ == '__main__':
     thread_list.append(t_clock)
     thread_list.append(t_sched)
 
+    # process thread creation
     while True:
         cur_time = int(t_clock.get_time()/1000)
         # starting a process thread
@@ -92,6 +93,7 @@ if __name__ == '__main__':
             thread_list.append(t_proc)
             process_dict.pop(cur_time)
 
+        # using this to break right now, eventually we want to break when theres no commands left
         if len(thread_list) == num_processes + 2:
             break
 

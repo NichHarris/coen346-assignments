@@ -38,7 +38,7 @@ class Process(threading.Thread):
         self._output.write(
             "Clock: {}, Process {}: {}\n".format(self.clock_thread.get_time(), self._process_id, "Started"))
 
-        # run thread for its time
+        # run thread for its service time
         while int(self.clock_thread.get_time()/1000) - self._start_time < self._service_time:
             pass
 
