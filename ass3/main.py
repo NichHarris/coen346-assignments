@@ -71,9 +71,8 @@ if __name__ == '__main__':
     # create clock thread
     t_clock = Clock()
     # create scheduling thread
-    t_sched = Scheduler()
+    t_sched = Scheduler(t_clock, thread_list, process_list, num_processes)
 
-    t_proc = None
     # start clock thread
     t_clock.start()
     # start scheduler thread
@@ -83,20 +82,22 @@ if __name__ == '__main__':
     thread_list.append(t_clock)
     thread_list.append(t_sched)
 
-    # this will probably need to be done in the scheduler -> FIFO
-    # process thread creation
-    while True:
-        # starting a process thread
-        cur_time = int(t_clock.get_time()/1000)
-        tuple = process_list[0]
-        if cur_time == tuple[1]:
-            t_proc = Process(t_clock, output, tuple[0], tuple[1], tuple[2])
-            t_proc.start()
-            thread_list.append(t_proc)
-            process_list.pop(0)
-        # using this to break right now, eventually we want to break when theres no commands left
-        if len(thread_list) == num_processes + 2:
-            break
+    t_sched.create_proc_thread()
+
+    # # this will probably need to be done in the scheduler -> FIFO
+    # # process thread creation
+    # while True:
+    #     # starting a process thread
+    #     cur_time = int(t_clock.get_time()/1000)
+    #     tuple = process_list[0]
+    #     if cur_time == tuple[1]:
+    #         t_proc = Process(t_clock, output, tuple[0], tuple[1], tuple[2])
+    #         t_proc.start()
+    #         thread_list.append(t_proc)
+    #         process_list.pop(0)
+    #     # using this to break right now, eventually we want to break when theres no commands left
+    #     if len(thread_list) == num_processes + 2:
+    #         break
 
     # print list of threads
     print(thread_list)
