@@ -92,22 +92,28 @@ if __name__ == '__main__':
 
     # process_list index
     i = 0
+    process_status = False
+    actual_start = 0
     while True:
         times = process_list[i]
         r_time = times[0]
         serv_time = times[1]
         cur_time = int(t_clock.get_time())/1000
-        if cur_time >= r_time:
+        if cur_time >= r_time and not process_status:
             t_proc = Process(t_clock, output, i, r_time)
             t_proc.start()
             thread_list.append(t_proc)
+            actual_start = cur_time
+            process_status = True
+            # current logic for terminating threads -> iz trash needs improvement
+        if cur_time - actual_start >= serv_time:
             i += 1
+            t_proc.set_terminate(True)
+            process_status = False
+
         if len(process_list)-1 < i:
             break
-        # current logic for terminating threads -> iz trash needs improvement
-        # if len(thread_list) > 2:
-        #     if serv_time >= cur_time - thread_list[i+1].get_start_time():
-        #         t_proc.set_terminate(True)
+
 
     print(thread_list)
     # testing clock rounding
