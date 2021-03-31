@@ -15,7 +15,7 @@ from process import Process
 class Scheduler(threading.Thread):
 
     # default constructor
-    def __init__(self, clock, t_list, p_list, num_processes):
+    def __init__(self, clock, t_list, p_list, output_file, num_processes , num_cores):
         # initialize scheduling thread
         super(Scheduler, self).__init__()
         # set thread name
@@ -29,9 +29,13 @@ class Scheduler(threading.Thread):
         # initialize list of processes
         self._proc_list = p_list
         # initialize output file
-        self._output = open("output.txt", "w")
-        # num of processes
+        self._output = output_file
+        # number of processes
         self.num_proc = num_processes
+        # number of cores
+        self._cores = num_cores
+        # number of active threads
+        self._active_processes = []
 
     # run scheduler thread
     def run(self):
@@ -49,16 +53,26 @@ class Scheduler(threading.Thread):
     def set_terminate(self, state):
         self.terminate = state
 
+    # create process threads
     def create_proc_thread(self):
         while True:
             # process thread creation
             cur_time = int(self.clock_thread.get_time()/1000)
-            tuple = self._proc_list[0]
-            if cur_time == tuple[1]:
-                t_proc = Process(self.clock_thread, self._output, tuple[0], tuple[1], tuple[2])
+            # holds process data: id, ready time, service time
+            proc_data = self._proc_list[0]
+
+            # don't create more threads if cores are full
+            while len(self._active_processes) == self._cores:
+                continue
+
+            # create process thread if ready time is now or has passed, and there is cores available
+            if cur_time >= proc_data[1]:
+                t_proc = Process(self.clock_thread, self._active_processes, self._output, proc_data[0], proc_data[1], proc_data[2])
                 t_proc.start()
                 self._thread_list.append(t_proc)
+                self._active_processes.append(t_proc)
                 self._proc_list.pop(0)
-            # using this to break right now, eventually we want to break when theres no commands left
+                print(self._active_processes)
+            # break out of process creation
             if len(self._thread_list) == self.num_proc + 2:
                 break

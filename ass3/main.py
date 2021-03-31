@@ -71,7 +71,7 @@ if __name__ == '__main__':
     # create clock thread
     t_clock = Clock()
     # create scheduling thread
-    t_sched = Scheduler(t_clock, thread_list, process_list, num_processes)
+    t_sched = Scheduler(t_clock, thread_list, process_list, output, num_processes, num_cores)
 
     # start clock thread
     t_clock.start()
@@ -82,22 +82,8 @@ if __name__ == '__main__':
     thread_list.append(t_clock)
     thread_list.append(t_sched)
 
+    # create process threads
     t_sched.create_proc_thread()
-
-    # # this will probably need to be done in the scheduler -> FIFO
-    # # process thread creation
-    # while True:
-    #     # starting a process thread
-    #     cur_time = int(t_clock.get_time()/1000)
-    #     tuple = process_list[0]
-    #     if cur_time == tuple[1]:
-    #         t_proc = Process(t_clock, output, tuple[0], tuple[1], tuple[2])
-    #         t_proc.start()
-    #         thread_list.append(t_proc)
-    #         process_list.pop(0)
-    #     # using this to break right now, eventually we want to break when theres no commands left
-    #     if len(thread_list) == num_processes + 2:
-    #         break
 
     # print list of threads
     print(thread_list)
@@ -111,17 +97,3 @@ if __name__ == '__main__':
 
     # close output file
     output.close()
-
-    # # counter used to traverse each previously generated list for process specifications
-    # counter = 0
-    # # generate a Process object and add it to the list of processes
-    # for user in user_dict:
-    #     for i in range(0, user_dict[user]):
-    #         processes.append(Process(user, i, ready_time[counter], service_time[counter]))
-    #         counter += 1
-    #
-    # # sort the processes list by ready time in ascending order (to be used as a queue)
-    # processes.sort(key=lambda x: x.ready_time, reverse=False)
-    #
-    # # run the scheduler
-    # Scheduler(processes, quantum)

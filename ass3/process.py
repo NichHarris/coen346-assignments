@@ -14,7 +14,7 @@ import threading
 class Process(threading.Thread):
 
     # default constructor
-    def __init__(self, clock, output_file, proc_id, start_time, service_time):
+    def __init__(self, clock, active_processes, output_file, proc_id, start_time, service_time):
         # initialize process thread
         super(Process, self).__init__()
         # set thread name
@@ -31,6 +31,8 @@ class Process(threading.Thread):
         self._start_time = start_time
         # initialize service time
         self._service_time = service_time
+        # number of active threads
+        self.proc_list = active_processes
 
     # run process thread
     def run(self):
@@ -41,6 +43,13 @@ class Process(threading.Thread):
         # run thread for its service time
         while int(self.clock_thread.get_time()/1000) - self._start_time < self._service_time:
             pass
+
+        print("\n1: {}".format(self.proc_list))
+
+        # pop a process from terminated process (clears up a core)
+        self.proc_list.pop(0) if self.proc_list[0].get_id() == self._process_id else self.proc_list.pop(1)
+
+        print("\n2: {}".format(self.proc_list))
 
         # print process finished to output file
         self._output.write(
@@ -59,3 +68,6 @@ class Process(threading.Thread):
 
     def get_start_time(self):
         return self._start_time
+
+    def get_id(self):
+        return self._process_id
