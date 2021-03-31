@@ -14,7 +14,7 @@ import threading
 class Process(threading.Thread):
 
     # default constructor
-    def __init__(self, clock, output_file, proc_id):
+    def __init__(self, clock, output_file, proc_id, start_time):
         # initialize process thread
         super(Process, self).__init__()
         # set thread name
@@ -27,6 +27,8 @@ class Process(threading.Thread):
         self.clock_thread = clock
         # initialize output file
         self._output = output_file
+        # initialize start time
+        self._start_time = start_time
 
     # run process thread
     def run(self):
@@ -52,3 +54,6 @@ class Process(threading.Thread):
             "Clock: {}, Process {}: {}\n".format(
                 self.clock_thread.get_time(), self._process_id,
                 state))
+
+    def get_start_time(self):
+        return self._start_time
