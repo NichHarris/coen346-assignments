@@ -39,7 +39,7 @@ if __name__ == '__main__':
     # list containing the service time for each process
     service_time = []
     # process list
-    process_list = []
+    process_dict = {}
 
     # populate list of commands
     for command in commands:
@@ -49,22 +49,14 @@ if __name__ == '__main__':
                 temp_list.append(cmd)
             else:
                 temp_list.append(int(cmd))
-
         command_list.append(temp_list)
 
-    # alternative approach below
-    # # populate process ready and service time lists
-    # for process in proc_lines:
-    #     ready_time = int(process.split(" ")[0])
-    #     service_time = int(process.split(" ")[1].rstrip())
-
-    # populate process_list
+    # populate process_dict
+    id = 1
     for process in proc_lines:
-        # append tuple of ready time and service time
-        process_list.append((int(process.split(" ")[0]), int(process.split(" ")[1].rstrip())))
-
-    # sort the processes list by ready time in ascending order
-    process_list.sort(key=lambda ready: ready[0])
+        # key of process ready time and value tuple of service time and process id
+        process_dict[int(process.split(" ")[0])] = (int(process.split(" ")[1].rstrip()), id)
+        id += 1
 
     # close the files
     mem_config.close()
@@ -90,30 +82,18 @@ if __name__ == '__main__':
     thread_list.append(t_clock)
     thread_list.append(t_sched)
 
-    # process_list index
-    i = 0
-    process_status = False
-    actual_start = 0
     while True:
-        times = process_list[i]
-        r_time = times[0]
-        serv_time = times[1]
-        cur_time = int(t_clock.get_time())/1000
-        if cur_time >= r_time and not process_status:
-            t_proc = Process(t_clock, output, i, r_time)
+        cur_time = int(t_clock.get_time()/1000)
+        # starting a process thread
+        if cur_time in process_dict:
+            tup = process_dict[cur_time]
+            t_proc = Process(t_clock, output, tup[1], cur_time, tup[0])
             t_proc.start()
             thread_list.append(t_proc)
-            actual_start = cur_time
-            process_status = True
-            # current logic for terminating threads -> iz trash needs improvement
-        if cur_time - actual_start >= serv_time:
-            i += 1
-            t_proc.set_terminate(True)
-            process_status = False
+            process_dict.pop(cur_time)
 
-        if len(process_list)-1 < i:
+        if len(thread_list) == num_processes + 2:
             break
-
 
     print(thread_list)
     # testing clock rounding
