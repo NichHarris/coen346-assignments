@@ -16,17 +16,24 @@ class Scheduler(threading.Thread):
     # default constructor
     def __init__(self):
         # initialize scheduling thread
-        threading.Thread.__init__(self)
+        super(Scheduler, self).__init__()
         # set thread name
         self.name = "Scheduler"
+        # set terminate status
         self.terminate = False
 
     # run scheduler thread
     def run(self):
-        print("Starting " + self.name + " Thread")
+        # print thread status to console
+        print("\nStarting " + self.name + " Thread")
+
+        # run thread
         while not self.terminate:
             pass
-        print("Exiting " + self.name + " Thread")
 
+        # print thread status to console
+        print("\nExiting " + self.name + " Thread")
+
+    # set thread to terminate
     def set_terminate(self, state):
         self.terminate = state

@@ -15,35 +15,39 @@ import time
 class Clock(threading.Thread):
     def __init__(self):
         # initialize clock thread
-        threading.Thread.__init__(self)
+        super(Clock, self).__init__()
         # set thread name
         self.name = "Clock"
         # start timer
         self._total_elapsed_time = time.perf_counter()
-
+        # set terminate status
         self.terminate = False
 
     # run clock thread
     def run(self):
-        print("Starting " + self.name + " Thread")
+        # print thread status to console
+        print("\nStarting " + self.name + " Thread")
+
+        # run thread
         while not self.terminate:
             self.update_time()
-        print("Exiting " + self.name + " Thread")
 
-    # update and return the total elapsed time
+        # print thread status to console
+        print("\nExiting " + self.name + " Thread")
+
+    # update and return the total elapsed time, rounded to nearest 10.
     def get_time(self):
         self.update_time()
-        return self._total_elapsed_time
+        return round(int(self._total_elapsed_time*1000)/10)*10
 
     # update the total elapsed time
     def update_time(self):
         self._total_elapsed_time = time.perf_counter()
 
-    def wait(self):
-        time.sleep(3)
+    # wait for a specified duration
+    def wait(self, duration):
+        time.sleep(duration)
 
-    def get_count(self):
-        return threading.activeCount()
-
+    # set thread to terminate
     def set_terminate(self, state):
         self.terminate = state

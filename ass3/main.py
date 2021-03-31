@@ -9,8 +9,7 @@
 # import the necessary packages
 from clock import Clock
 from scheduler import Scheduler
-import time
-import threading
+from process import Process
 
 # entrypoint of script execution
 if __name__ == '__main__':
@@ -59,34 +58,46 @@ if __name__ == '__main__':
     proc_file.close()
     cmd_file.close()
 
+    # create output file
+    output = open("output.txt", "w")
+    # create list containing all threads
     thread_list = []
     # create clock thread
-    # TODO: Check if this is working properly -> creating a single thread
     t_clock = Clock()
     # create scheduling thread
-    # TODO: Check if this is working properly -> creating a single thread
     t_sched = Scheduler()
-
-    print(threading.activeCount())
 
     # start clock thread
     t_clock.start()
     # start scheduler thread
     t_sched.start()
 
-    print(threading.activeCount())
-
     # append threads to thread_list
     thread_list.append(t_clock)
     thread_list.append(t_sched)
 
+    # testing clock rounding
+    print("\n{}".format(t_clock.get_time()))
+    t_clock.wait(2)
+    print("\n{}".format(t_clock.get_time()))
+
+    # testing process thread
+    t_proc = Process(t_clock, output, 2)
+    t_proc.start()
+    t_proc.print_to_file(2, "Poop")
+
+    # below is the end of the program
     # signal for clock and scheduler to stop running
     t_clock.set_terminate(True)
     t_sched.set_terminate(True)
+    t_proc.set_terminate(True)
 
     # join all threads
     for t in thread_list:
         t.join()
+
+    # close output file
+    output.close()
 
     # # counter used to traverse each previously generated list for process specifications
     # counter = 0
