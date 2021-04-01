@@ -14,7 +14,7 @@ import threading
 class Process(threading.Thread):
 
     # default constructor
-    def __init__(self, clock, manager, c_list, active_processes, output_file, proc_id, start_time, service_time):
+    def __init__(self, clock, manager, commands, active_processes, output_file, proc_id, start_time, service_time):
         # initialize process thread
         super(Process, self).__init__()
         # set thread name
@@ -27,8 +27,8 @@ class Process(threading.Thread):
         self.clock_thread = clock
         # initialize manager object
         self.manager_thread = manager
-        # initialize list of commands
-        self._cmd_list = c_list
+        # initialize commands object
+        self._commands = commands
         # initialize output file
         self._output = output_file
         # initialize start time
@@ -37,6 +37,8 @@ class Process(threading.Thread):
         self._service_time = service_time
         # number of active threads
         self.proc_list = active_processes
+
+        self.sem = threading.Semaphore(1)
 
     # run process thread
     def run(self):
@@ -50,8 +52,11 @@ class Process(threading.Thread):
 
         # run thread for its service time
         while int(self.clock_thread.get_time()/1000) - self._start_time < self._service_time:
-            # TODO: This is where we should handle commands
-            pass
+            command = self._commands.get_cmd_list()[self._commands.current_cmd()]
+            self.manager_thread.call_api(command, self._process_id)
+            self.clock_thread.wait(0.5)
+            # increment to next command
+            self._commands.next_cmd()
 
         # pop a process from terminated process (clears up a core)
         self.proc_list.pop(0) if self.proc_list[0].get_id() == self._process_id else self.proc_list.pop(1)

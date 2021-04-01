@@ -10,9 +10,9 @@
 from clock import Clock
 from scheduler import Scheduler
 from vm_manager import Manager
-from process import Process
 from disc_pages import DiscPages
 from virtual_memory import VirtualMemory
+from command import Commands
 
 # entrypoint of script execution
 if __name__ == '__main__':
@@ -67,6 +67,8 @@ if __name__ == '__main__':
 
     # create disc page object
     disc_page = DiscPages()
+    # create command object
+    cmd_obj = Commands(command_list)
     # create output file
     output = open("output.txt", "w")
     # create list containing all threads
@@ -76,9 +78,9 @@ if __name__ == '__main__':
     # create virtual memory object
     memory = VirtualMemory(num_pages, t_clock)
     # create clock thread
-    t_manager = Manager(memory, disc_page)
+    t_manager = Manager(memory, t_clock, disc_page, output)
     # create scheduling thread
-    t_sched = Scheduler(t_manager, t_clock, thread_list, process_list, command_list, output, num_processes, num_cores)
+    t_sched = Scheduler(t_manager, cmd_obj, t_clock, thread_list, process_list, output, num_processes, num_cores)
 
     # start clock thread
     t_clock.start()

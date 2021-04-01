@@ -6,10 +6,7 @@
 #
 # Virtual Memory Management Simulator with Concurrency Control
 
-
 # class used to handle the virtual memory -> write/read
-
-
 class VirtualMemory:
 
     # default constructor
@@ -20,7 +17,7 @@ class VirtualMemory:
         # number of memory pages available
         self._num_pages = num_pages
         # access value for each page
-        self.access_val = [num_pages]
+        self.access_val = [0]*num_pages
         # initialize the clock thread
         self.clock = t_clock
 
@@ -34,19 +31,31 @@ class VirtualMemory:
                 return self._memory[i]
         return -1
 
-        # i = 0
-        # for page in self._memory:
-        #     if page[1] == variableId:
-        #         # need to update access time of page
-        #         self._memory[i][0] = int(self.clock.get_time() / 1000)
-        #         return self._memory[i]
-        #     i += 1
-        # return -1
+    def get_lru_index(self):
+        lowest = self.access_val[0]
+        index = 0
+        for i in range(0, self._num_pages - 1):
+            if lowest >= self.access_val[i]:
+                lowest = self.access_val[i]
+                index = i
+        return index
 
     # set the page for a certain spot in virtual memory
-    def set_page(self, pos: int, page: list):
-        self._memory[pos] = page
-        self.set_access_val(pos)
+    def set_page(self, page: list):
+        print(self.access_val)
+        if self.is_full:
+            index = min(self.access_val)
+            self._memory[index] = page
+            self.set_access_val(index)
+        else:
+            for i in range(0, self._num_pages - 1):
+                if self._memory[i][0] == list[0]:
+                    self._memory[i] = page
+                    self.set_access_val(i)
+                    break
+                if not self._memory[i]:
+                    self._memory[i] = page
+                    self.set_access_val(i)
 
     # return number of memory pages
     def get_num_pages(self):
@@ -60,9 +69,15 @@ class VirtualMemory:
     def set_access_val(self, pos):
         self.access_val[pos] = int(self.clock.get_time() / 1000)
 
+    def get_memory(self):
+        return self._memory
+
+    def get_access_list(self):
+        return self.access_val
+
     # checks for empty spot in memory
     def is_full(self):
         for page in self._memory:
-            if page is None:
+            if not page:
                 return False
         return True

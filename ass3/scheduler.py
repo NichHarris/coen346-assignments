@@ -15,7 +15,7 @@ from process import Process
 class Scheduler(threading.Thread):
 
     # default constructor
-    def __init__(self, manager, clock, t_list, p_list, c_list, output_file, num_processes , num_cores):
+    def __init__(self, manager, commands, clock, t_list, p_list, output_file, num_processes, num_cores):
         # initialize scheduling thread
         super(Scheduler, self).__init__()
         # set thread name
@@ -26,12 +26,12 @@ class Scheduler(threading.Thread):
         self.manager_thread = manager
         # initialize clock object
         self.clock_thread = clock
+        # initialize command object
+        self._commands = commands
         # initialize list of threads
         self._thread_list = t_list
         # initialize list of processes
         self._proc_list = p_list
-        # initialize list of commands
-        self._cmd_list = c_list
         # initialize output file
         self._output = output_file
         # number of processes
@@ -40,8 +40,6 @@ class Scheduler(threading.Thread):
         self._cores = num_cores
         # number of active threads
         self._active_processes = []
-        # cmd index
-        self._cmd_index = 0
 
     # run scheduler thread
     def run(self):
@@ -63,14 +61,6 @@ class Scheduler(threading.Thread):
     def get_active_proc(self):
         return self._active_processes
 
-    # return position in command list
-    def current_cmd(self):
-        return self._cmd_index
-
-    # increment cmd index
-    def next_cmd(self):
-        self._cmd_index = (self._cmd_index + 1) % len(self._cmd_list)
-
     # create process threads
     def create_proc_thread(self):
         while True:
@@ -82,14 +72,12 @@ class Scheduler(threading.Thread):
 
                 # create process thread if ready time is now or has passed, and there is cores available
                 if cur_time >= proc_data[1] and len(self._active_processes) != self._cores:
-                    t_proc = Process(self.clock_thread, self.manager_thread, self._cmd_list, self._active_processes, self._output, proc_data[0], cur_time, proc_data[2])
+                    t_proc = Process(self.clock_thread, self.manager_thread, self._commands, self._active_processes, self._output, proc_data[0], cur_time, proc_data[2])
                     t_proc.start()
                     t_proc.setName(proc_data[0])
                     self._thread_list.append(t_proc)
                     self._active_processes.append(t_proc)
                     self._proc_list.pop(0)
-                    print(self._active_processes)
-
             # break out of process creation
             if len(self._active_processes) == 0 and len(self._proc_list) == 0:
                 break
