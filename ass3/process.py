@@ -50,6 +50,7 @@ class Process(threading.Thread):
 
         # run thread for its service time
         while int(self.clock_thread.get_time()/1000) - self._start_time < self._service_time:
+            # TODO: This is where we should handle commands
             pass
 
         # pop a process from terminated process (clears up a core)
