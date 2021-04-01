@@ -36,6 +36,10 @@ class Process(threading.Thread):
 
     # run process thread
     def run(self):
+
+        # print thread status to console
+        print("\nStarting {} {} Thread".format(self.name, self._process_id))
+
         # print process started to output file
         self._output.write(
             "Clock: {}, Process {}: {}\n".format(self.clock_thread.get_time(), self._process_id, "Started"))
@@ -46,6 +50,9 @@ class Process(threading.Thread):
 
         # pop a process from terminated process (clears up a core)
         self.proc_list.pop(0) if self.proc_list[0].get_id() == self._process_id else self.proc_list.pop(1)
+
+        # print thread status to console
+        print("\nExiting {} {} Thread".format(self.name, self._process_id))
 
         # print process finished to output file
         self._output.write(
