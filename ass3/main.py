@@ -65,8 +65,7 @@ if __name__ == '__main__':
     proc_file.close()
     cmd_file.close()
 
-    # create virtual memory object
-    memory = VirtualMemory(num_pages)
+
     # create disc page object
     disc_page = DiscPages()
     # create output file
@@ -75,6 +74,8 @@ if __name__ == '__main__':
     thread_list = []
     # create clock thread
     t_clock = Clock()
+    # create virtual memory object
+    memory = VirtualMemory(num_pages, t_clock)
     # create clock thread
     t_manager = Manager(memory, disc_page)
     # create scheduling thread
