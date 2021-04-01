@@ -53,6 +53,10 @@ class Scheduler(threading.Thread):
     def set_terminate(self, state):
         self.terminate = state
 
+    # get list of active processes
+    def get_active_proc(self):
+        return self._active_processes
+
     # create process threads
     def create_proc_thread(self):
         while True:

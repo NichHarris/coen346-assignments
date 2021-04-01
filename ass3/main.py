@@ -74,22 +74,22 @@ if __name__ == '__main__':
     # create clock thread
     t_clock = Clock()
     # create virtual memory object
-    # memory = VirtualMemory(num_pages, t_clock)
+    memory = VirtualMemory(num_pages, t_clock)
     # create clock thread
-    # t_manager = Manager(memory, disc_page)
+    t_manager = Manager(memory, disc_page)
     # create scheduling thread
     t_sched = Scheduler(t_clock, thread_list, process_list, output, num_processes, num_cores)
 
     # start clock thread
     t_clock.start()
     # start vm manager thread
-    # t_manager.start()
+    t_manager.start()
     # start scheduler thread
     t_sched.start()
 
     # append threads to thread_list
     thread_list.append(t_clock)
-    # thread_list.append(t_manager)
+    thread_list.append(t_manager)
     thread_list.append(t_sched)
 
     # create process threads
