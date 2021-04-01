@@ -37,17 +37,23 @@ class Manager(threading.Thread):
         print("\nExiting " + self.name + " Thread")
 
     def store(self, variableId, value):
-        if len(self._memory) == self._memory.get_num_pages():
+        if self._memory.is_full():
             self._disc_page.write_to_page()
-            pass
         else:
-            self._memory.set_page(0, [variableId, value]) if self._memory.get_page(0) is None else self._memory.set_page(1, [variableId, value])
-            pass
+            for i in range(0, self._memory.get_num_pages() - 1):
+                if self._memory[i] is None:
+                    self._memory.set_page(i, [variableId, value])
 
     def release(self, variableId: str):
         pass
 
     def look_up(self, variableId: str):
+        value = self._memory.get_page(variableId)
+        if value == -1:
+            self.swap()
+
+    # swap
+    def swap(self):
         pass
 
     # set thread to terminate

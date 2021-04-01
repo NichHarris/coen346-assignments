@@ -14,7 +14,7 @@ import threading
 class Process(threading.Thread):
 
     # default constructor
-    def __init__(self, clock, active_processes, output_file, proc_id, start_time, service_time):
+    def __init__(self, clock, manager, c_list, active_processes, output_file, proc_id, start_time, service_time):
         # initialize process thread
         super(Process, self).__init__()
         # set thread name
@@ -25,6 +25,10 @@ class Process(threading.Thread):
         self.terminate = False
         # initialize clock object
         self.clock_thread = clock
+        # initialize manager object
+        self.manager_thread = manager
+        # initialize list of commands
+        self._cmd_list = c_list
         # initialize output file
         self._output = output_file
         # initialize start time

@@ -78,7 +78,7 @@ if __name__ == '__main__':
     # create clock thread
     t_manager = Manager(memory, disc_page)
     # create scheduling thread
-    t_sched = Scheduler(t_clock, thread_list, process_list, output, num_processes, num_cores)
+    t_sched = Scheduler(t_manager, t_clock, thread_list, process_list, command_list, output, num_processes, num_cores)
 
     # start clock thread
     t_clock.start()

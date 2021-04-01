@@ -64,5 +64,5 @@ class VirtualMemory:
     def is_full(self):
         for page in self._memory:
             if page is None:
-                return True
-        return False
+                return False
+        return True
