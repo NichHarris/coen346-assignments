@@ -4,7 +4,7 @@
 # Nicholas Harris 40111093
 # Benjamin Grant 40059608
 #
-# Virtual Memory Management Simulation
+# Virtual Memory Management Simulator with Concurrency Control
 
 # import the necessary packages
 import threading

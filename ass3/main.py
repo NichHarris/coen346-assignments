@@ -4,11 +4,12 @@
 # Nicholas Harris 40111093
 # Benjamin Grant 40059608
 #
-# Virtual Memory Management Simulation
+# Virtual Memory Management Simulator with Concurrency Control
 
 # import the necessary packages
 from clock import Clock
 from scheduler import Scheduler
+from vm_manager import Manager
 from process import Process
 from disc_pages import DiscPages
 from virtual_memory import VirtualMemory
@@ -64,22 +65,31 @@ if __name__ == '__main__':
     proc_file.close()
     cmd_file.close()
 
+    # create virtual memory object
+    memory = VirtualMemory(num_pages)
+    # create disc page object
+    disc_page = DiscPages()
     # create output file
     output = open("output.txt", "w")
     # create list containing all threads
     thread_list = []
     # create clock thread
     t_clock = Clock()
+    # create clock thread
+    t_manager = Manager(memory, disc_page)
     # create scheduling thread
     t_sched = Scheduler(t_clock, thread_list, process_list, output, num_processes, num_cores)
 
     # start clock thread
     t_clock.start()
+    # start vm manager thread
+    t_manager.start()
     # start scheduler thread
     t_sched.start()
 
     # append threads to thread_list
     thread_list.append(t_clock)
+    thread_list.append(t_manager)
     thread_list.append(t_sched)
 
     # create process threads

@@ -4,7 +4,7 @@
 # Nicholas Harris 40111093
 # Benjamin Grant 40059608
 #
-# Fair-share Process Scheduling Simulator
+# Virtual Memory Management Simulator with Concurrency Control
 
 # import the necessary packages
 import threading
@@ -69,10 +69,10 @@ class Scheduler(threading.Thread):
             if cur_time >= proc_data[1]:
                 t_proc = Process(self.clock_thread, self._active_processes, self._output, proc_data[0], proc_data[1], proc_data[2])
                 t_proc.start()
+                t_proc.setName(proc_data[0])
                 self._thread_list.append(t_proc)
                 self._active_processes.append(t_proc)
                 self._proc_list.pop(0)
-                print(self._active_processes)
             # break out of process creation
             if len(self._thread_list) == self.num_proc + 2:
                 break

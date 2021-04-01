@@ -4,10 +4,7 @@
 # Nicholas Harris 40111093
 # Benjamin Grant 40059608
 #
-# Fair-share Process Scheduling Simulator
-
-# import the necessary packages
-
+# Virtual Memory Management Simulator with Concurrency Control
 
 # class used to handle the disc pages -> write/read to a file
 class DiscPages:
@@ -17,12 +14,32 @@ class DiscPages:
         self._output = open("vm.txt", "w")
         self._output.close()
 
+    # write to disc page
     def write_to_page(self, pg_list: list):
         self._output = open("vm.txt", "a")
-        self._output.write("{}\n".format(pg_list))
+        string = ""
+        for val in pg_list:
+            string += str(val)
+            string += " "
+        self._output.write("{}\n".format(string))
         self._output.close()
 
-    def read_from_page(self, line):
+    # find variableId in disc page
+    def read_from_page(self, variableId):
         with open('vm.txt', 'r') as disc_pg:
             pages = disc_pg.readlines()
-            return pages[line]
+        for line in pages:
+            page = line.strip(" ")
+            if variableId == page[0]:
+                return page
+        return -1
+
+    # find if variableId exists in disc page
+    def has_page(self, variableId):
+        with open('vm.txt', 'r') as disc_pg:
+            pages = disc_pg.readlines()
+        for line in pages:
+            page = line.strip(" ")
+            if variableId == page[0]:
+                return True
+        return False

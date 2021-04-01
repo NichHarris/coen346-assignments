@@ -4,7 +4,7 @@
 # Nicholas Harris 40111093
 # Benjamin Grant 40059608
 #
-# Fair-share Process Scheduling Simulator
+# Virtual Memory Management Simulator with Concurrency Control
 
 # import the necessary packages
 import threading
@@ -44,12 +44,8 @@ class Process(threading.Thread):
         while int(self.clock_thread.get_time()/1000) - self._start_time < self._service_time:
             pass
 
-        print("\n1: {}".format(self.proc_list))
-
         # pop a process from terminated process (clears up a core)
         self.proc_list.pop(0) if self.proc_list[0].get_id() == self._process_id else self.proc_list.pop(1)
-
-        print("\n2: {}".format(self.proc_list))
 
         # print process finished to output file
         self._output.write(
