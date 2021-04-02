@@ -52,21 +52,22 @@ class Process(threading.Thread):
             "Clock: {}, Process {}: {}\n".format(self.clock_thread.get_time(), self._process_id, "Started"))
 
         # run thread for its service time
-        while int(self.clock_thread.get_time() / 1000) - self._start_time < self._service_time:
+        while self.clock_thread.get_time() / 1000 - self._start_time < self._service_time:
             # get current command
             command = self._commands.get_cmd_list()[self._commands.current_cmd()]
+            self._commands.next_cmd()
             # TODO: Debug synchronization
-            self.lock.acquire()
             # block access to critical section
+            self.lock.acquire()
             self.manager_thread.call_api(command, self._process_id)
+            self.lock.release()
             # TODO: Debug what he means by wait a random time for api calls, should it even be in here?
+
             # wait for a random amount of time
             self.clock_thread.wait(
-                min(self.clock_thread.get_time() / 1000 - self._start_time, self.rand.randrange(10, 1000) / 1000))
+                min(self._start_time + self._service_time - int(self.clock_thread.get_time() / 1000), self.rand.randrange(10, 1000) / 1000))
             # increment to next command
-            self._commands.next_cmd()
             # release access to critical section
-            self.lock.release()
 
 
         # pop a process from terminated process (clears up a core)

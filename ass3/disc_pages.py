@@ -16,23 +16,52 @@ class DiscPages:
 
     # write to disk page
     def write_to_page(self, pg_list: list):
+        with open("vm.txt", "r") as disk:
+            pages = disk.readlines()
+        disk.close()
+        for page in pages:
+            line = page.rstrip('\n').split(" ")
+            if line[0] == pg_list[0]:
+                self.replace(pages, pg_list)
+        self.append_to_page(pg_list)
+
+    def append_to_page(self, pg_list: list):
         self._output = open("vm.txt", "a")
         string = ""
         for val in pg_list:
             string += str(val)
             string += " "
-        self._output.write("{}\n".format(string))
+        self._output.write("{}\n".format(string.rstrip()))
         self._output.close()
+
+    def replace(self, disk_pages, pg_list):
+        with open("vm.txt", "w") as disk:
+            for page in disk_pages:
+                line = page.rstrip('\n').split(" ")
+                string = ""
+                if line[0] != pg_list[0]:
+                    for val in line:
+                        string += str(val)
+                        string += " "
+                        print("here1: " + string)
+                    disk.write("{}\n".format(string.rstrip()))
+                else:
+                    for val in pg_list:
+                        string += str(val)
+                        string += " "
+                        print("here2: " + string)
+                    disk.write("{}\n".format(string.rstrip()))
+        disk.close()
 
     # find variableId in disk page
     def read_from_page(self, variableId: str):
         with open('vm.txt', 'r') as disk_pg:
             disk = disk_pg.readlines()
-        for line in disk:
-            page = line.rstrip('\n').split(" ")
-            if variableId == str(page[0]):
+        for page in disk:
+            line = page.rstrip('\n').split(" ")
+            if variableId == line[0]:
                 disk_pg.close()
-                return page
+                return line
         disk_pg.close()
         # TODO: Think of something better to do in this case
         return -1
