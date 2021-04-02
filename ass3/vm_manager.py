@@ -13,7 +13,7 @@ import threading
 # class used to created a threaded virtual memory manage
 class Manager(threading.Thread):
 
-    def __init__(self, memory, clock, disk_page, output_file):
+    def __init__(self, memory, cmd_obj, clock, disk_page, output_file):
         # initialize manager thread
         super(Manager, self).__init__()
         # set thread _name
@@ -22,12 +22,16 @@ class Manager(threading.Thread):
         self._terminate = False
         # initialize virtual memory object
         self._v_mem = memory
+        # initialize commands object
+        self.commands = cmd_obj
         # initialize clock object
         self._clock_thread = clock
         # initialize disc page object
         self._disk_page = disk_page
         # initialize output file
         self._output = output_file
+
+        self.lock = threading.Lock()
 
     def run(self):
         # print thread status to console
@@ -69,7 +73,10 @@ class Manager(threading.Thread):
         disk_copy = self._disk_page.read_from_page(variableId)
         if disk_copy == -1:
             # doesn't exist in disk page
-            print("SWAP error: No copy of variable on disk")
+            print("SWAP error: No copy of variable on disk")        # write to output file
+            self._output.write(
+                "Clock: {}, {}, {}: Variable {} with Variable {}\n".format(self._clock_thread.get_time(), self._name, "Swap ERROR", variableId, mem_copy[0]))
+
             return -1
         else:
             # set virtual memory to copy from disk
@@ -79,11 +86,13 @@ class Manager(threading.Thread):
 
         # write to output file
         self._output.write(
-            "Clock: {}, {}, {}: Variable {} with Variable {}\n".format(self._clock_thread.get_time(), self._name, "Swap", variableId, mem_copy[1]))
+            "Clock: {}, {}, {}: Variable {} with Variable {}\n".format(self._clock_thread.get_time(), self._name, "Swap", variableId, mem_copy[0]))
         return disk_copy[1]
 
     # TODO: Debug api calls timing, this probably relates to synchronization
     def call_api(self, command: list, p_id):
+        # self.lock.acquire()
+        self.commands.next_cmd()
         if command[0] == "Store" and len(command) == 3:
             self.store(command[1], command[2])
             self.print_to_output(p_id, command[0], command[1], command[2])
@@ -95,6 +104,7 @@ class Manager(threading.Thread):
             self.print_to_output(p_id, command[0], command[1], value)
         else:
             print("Invalid command")
+        # self.lock.release()
 
     # set thread to _terminate
     def set_terminate(self, state):

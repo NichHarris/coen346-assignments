@@ -36,6 +36,8 @@ class Process(threading.Thread):
         self._start_time = start_time
         # initialize service time
         self._service_time = service_time
+        # terminate time
+        self._terminate_time = self._start_time + self._service_time
         # number of active threads
         self.proc_list = active_processes
         self.rand = Random()
@@ -51,24 +53,35 @@ class Process(threading.Thread):
         self._output.write(
             "Clock: {}, Process {}: {}\n".format(self.clock_thread.get_time(), self._process_id, "Started"))
 
+        remaining_time = self._terminate_time - self.clock_thread.get_time()/1000
+
         # run thread for its service time
-        while self.clock_thread.get_time() / 1000 - self._start_time < self._service_time:
+        while remaining_time >= 0:
+            # TODO: Debug synchronization
             # get current command
             command = self._commands.get_cmd_list()[self._commands.current_cmd()]
-            self._commands.next_cmd()
-            # TODO: Debug synchronization
-            # block access to critical section
+
             self.lock.acquire()
+            # print info
+            print("Command: {} Running on Process: {} at time {}".format(command, self._process_id,
+                                                                         self.clock_thread.get_time()))
+            # block access to critical section
+
+            # call api
             self.manager_thread.call_api(command, self._process_id)
-            self.lock.release()
-            # TODO: Debug what he means by wait a random time for api calls, should it even be in here?
+
+            # # increment to next command
+            # self._commands.next_cmd()
 
             # wait for a random amount of time
-            self.clock_thread.wait(
-                min(self._start_time + self._service_time - int(self.clock_thread.get_time() / 1000), self.rand.randrange(10, 1000) / 1000))
-            # increment to next command
-            # release access to critical section
+            self.lock.release()
 
+            # release access to critical section
+            if self._terminate_time - self.clock_thread.get_time()/1000 > 0:
+                self.clock_thread.wait(
+                    min(self.clock_thread.get_time() - self._start_time, self.rand.randrange(10, 1000)))
+
+            remaining_time = self._terminate_time - self.clock_thread.get_time()/1000
 
         # pop a process from terminated process (clears up a core)
         self.proc_list.pop(0) if self.proc_list[0].get_id() == self._process_id else self.proc_list.pop(1)
