@@ -30,9 +30,10 @@ class DiscPages:
             pages = disc_pg.readlines()
         for line in pages:
             page = line.strip(" ")
+            print(page[0])
             if variableId == page[0]:
                 return page
-        return -1
+        return [0,0]
 
     # find if variableId exists in disc page
     def has_page(self, variableId):

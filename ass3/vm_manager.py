@@ -42,17 +42,21 @@ class Manager(threading.Thread):
 
     def store(self, variableId: str, value):
         if self.v_mem.is_full():
-            self._disc_page.write_to_page()
+            self._disc_page.write_to_page([variableId, value])
         else:
             self.v_mem.set_page([variableId, value])
 
     def release(self, variableId: str):
-        pass
+        for page in self.v_mem.get_memory():
+            if page[0] == variableId:
+                self.v_mem.release_page()
+
 
     def look_up(self, variableId: str):
         value = self.v_mem.get_page(variableId)
         if value == -1:
-            self.swap(variableId)
+            return self.swap(variableId)
+        return value
 
     # swap
     def swap(self, variableId):
@@ -63,6 +67,8 @@ class Manager(threading.Thread):
         mem_page = self.v_mem.get_memory()[min_index]
         # read from disc
         disc = self._disc_page.read_from_page(variableId)
+        if disc == -1:
+            pass # TODO: do something
         # set v_men page
         self.v_mem.set_page(disc)
         # set disc page
@@ -70,6 +76,7 @@ class Manager(threading.Thread):
 
         self._output.write(
             "Clock: {}, {}, {}: Variable {} with Variable {}\n".format(self.clock_thread.get_time(), self.name, "Swap", variableId, other_variable_id))
+        return disc
 
     def call_api(self, command: list, p_id):
         # TODO: This is should be done in manager
@@ -80,8 +87,8 @@ class Manager(threading.Thread):
             self.release(command[1])
             self.print_to_output(p_id, command[0], command[1], None)
         elif command[0] == "Lookup":
-            self.look_up(command[1])
-            self.print_to_output(p_id, command[0], command[1], None)
+            value = self.look_up(command[1])
+            self.print_to_output(p_id, command[0], command[1], value[1])
         else:
             print("Invalid command")
 

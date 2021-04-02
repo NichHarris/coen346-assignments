@@ -13,6 +13,7 @@ class VirtualMemory:
     def __init__(self, num_pages: int, t_clock):
         # list located in physical memory
         # memory format: [last access time, variableId, value]
+        # self._memory = [[None, None] for i in range(num_pages)]
         self._memory = [[] for i in range(num_pages)]
         # number of memory pages available
         self._num_pages = num_pages
@@ -22,13 +23,29 @@ class VirtualMemory:
         self.clock = t_clock
 
     # get a certain page from virtual memory
+    # def get_page(self, variableId: str):
+    #     # improved logic, uses access vaL list to set each memory pages access val
+    #     # this way we don't have to strip the access val from the data in memory
+    #     for i in range(0, self._num_pages - 1):
+    #         print("Test:" + str(variableId) + " " + str(self._memory[i][0]))
+    #         if self._memory[i][0] == variableId:
+    #             self.set_access_val(i)
+    #             return self._memory[i]
+    #     return -1
+
+    # get a certain page from virtual memory
     def get_page(self, variableId: str):
         # improved logic, uses access vaL list to set each memory pages access val
         # this way we don't have to strip the access val from the data in memory
-        for i in range(0, self._num_pages - 1):
-            if self._memory[i][0] == variableId:
+        i = 0
+        for page in self._memory:
+            print("memory: " + str(self._memory))
+            print("variableId and page: " + str(variableId) + " , " + str(page))
+            print("page[0]: " + str(page[0]))
+            if page[0] == variableId:
                 self.set_access_val(i)
-                return self._memory[i]
+                return page
+            i += 1
         return -1
 
     def get_lru_index(self):
@@ -41,21 +58,46 @@ class VirtualMemory:
         return index
 
     # set the page for a certain spot in virtual memory
-    def set_page(self, page: list):
-        print(self.access_val)
-        if self.is_full:
-            index = min(self.access_val)
-            self._memory[index] = page
-            self.set_access_val(index)
-        else:
-            for i in range(0, self._num_pages - 1):
-                if self._memory[i][0] == list[0]:
-                    self._memory[i] = page
-                    self.set_access_val(i)
-                    break
-                if not self._memory[i]:
-                    self._memory[i] = page
-                    self.set_access_val(i)
+    # def set_page(self, page: list):
+    #     print(self.access_val)
+    #     if self.is_full:
+    #         index = min(self.access_val)
+    #         self._memory[index] = page
+    #         self.set_access_val(index)
+    #     else:
+    #         for i in range(0, self._num_pages - 1):
+    #             if self._memory[i][0] == list[0]:
+    #                 self._memory[i] = page
+    #                 self.set_access_val(i)
+    #                 break
+    #             if not self._memory[i]:
+    #                 self._memory[i] = page
+    #                 self.set_access_val(i)
+
+    def release_page(self, variableId):
+        
+
+    # # set the page for a certain spot in virtual memory
+    # def set_page(self, _page: list):
+    #     # print("Access Time: " + str(self.access_val))
+    #     # print("Is Full?: " + str(self.is_full()))
+    #     if self.is_full():
+    #         index = self.access_val.index(min(self.access_val))
+    #         self._memory[index] = _page
+    #         self.set_access_val(index)
+    #     else:
+    #         i = 0
+    #         for page in self._memory:
+    #             print("Page: " + str(page))
+    #             if not page:
+    #                 self._memory[i] = _page
+    #                 self.set_access_val(i)
+    #                 break
+    #             if page[0] == _page[0]:
+    #                 self._memory[i] = _page
+    #                 self.set_access_val(i)
+    #                 break
+    #             i += 1
 
     # return number of memory pages
     def get_num_pages(self):

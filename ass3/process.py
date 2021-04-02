@@ -8,7 +8,7 @@
 
 # import the necessary packages
 import threading
-
+from random import Random
 
 # class used to encapsulate the specifications of each process
 class Process(threading.Thread):
@@ -37,8 +37,7 @@ class Process(threading.Thread):
         self._service_time = service_time
         # number of active threads
         self.proc_list = active_processes
-
-        self.sem = threading.Semaphore(1)
+        self.rand = Random()
 
     # run process thread
     def run(self):
@@ -54,9 +53,9 @@ class Process(threading.Thread):
         while int(self.clock_thread.get_time()/1000) - self._start_time < self._service_time:
             command = self._commands.get_cmd_list()[self._commands.current_cmd()]
             self.manager_thread.call_api(command, self._process_id)
-            self.clock_thread.wait(0.5)
             # increment to next command
             self._commands.next_cmd()
+            self.clock_thread.wait(min(self.clock_thread.get_time()/1000 - self._start_time, self.rand.randrange(10, 1000)/1000))
 
         # pop a process from terminated process (clears up a core)
         self.proc_list.pop(0) if self.proc_list[0].get_id() == self._process_id else self.proc_list.pop(1)
