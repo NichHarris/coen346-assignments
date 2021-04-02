@@ -65,7 +65,7 @@ class Scheduler(threading.Thread):
     def create_proc_thread(self):
         while True:
             # update time and round to the second
-            cur_time = int(self.clock_thread.get_time()/1000)
+            cur_time = self.clock_thread.get_time()/1000
             if len(self._proc_list) != 0:
                 # holds process data: id, ready time, service time
                 proc_data = self._proc_list[0]

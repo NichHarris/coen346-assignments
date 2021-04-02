@@ -65,34 +65,38 @@ class Manager(threading.Thread):
     # execute Swap if lookup located in disk space
     def swap(self, variableId: str):
         # index of least recently used virtual memory page
+        # self.lock.acquire()
         lru_index = self._v_mem.get_lru_index()
         # virtual memory copy
         mem_copy = self._v_mem.get_memory()[lru_index]
         # disk page copy
-        # TODO: Debug read_from_page
         disk_copy = self._disk_page.read_from_page(variableId)
+        # while disk_copy == -1:
+        #     disk_copy = self._disk_page.read_from_page(variableId)
         if disk_copy == -1:
             # doesn't exist in disk page
             print("SWAP error: No copy of variable on disk")        # write to output file
             self._output.write(
                 "Clock: {}, {}, {}: Variable {} with Variable {}\n".format(self._clock_thread.get_time(), self._name, "Swap ERROR", variableId, mem_copy[0]))
-
+            # self.lock.release()
             return -1
         else:
             # set virtual memory to copy from disk
             self._v_mem.set_page_i(lru_index, disk_copy)
+
         # update disk page with former virtual memory page
         self._disk_page.write_to_page(mem_copy)
 
         # write to output file
         self._output.write(
             "Clock: {}, {}, {}: Variable {} with Variable {}\n".format(self._clock_thread.get_time(), self._name, "Swap", variableId, mem_copy[0]))
+        # self.lock.release()
         return disk_copy[1]
 
     # TODO: Debug api calls timing, this probably relates to synchronization
     def call_api(self, command: list, p_id):
-        # self.lock.acquire()
         self.commands.next_cmd()
+        self.lock.acquire()
         if command[0] == "Store" and len(command) == 3:
             self.store(command[1], command[2])
             self.print_to_output(p_id, command[0], command[1], command[2])
@@ -104,7 +108,7 @@ class Manager(threading.Thread):
             self.print_to_output(p_id, command[0], command[1], value)
         else:
             print("Invalid command")
-        # self.lock.release()
+        self.lock.release()
 
     # set thread to _terminate
     def set_terminate(self, state):

@@ -47,7 +47,7 @@ class Process(threading.Thread):
     # run process thread
     def run(self):
         # print thread status to console
-        print("\nStarting {} {} Thread".format(self.name, self._process_id))
+        print("\nStarting Process {} Thread".format(self._process_id))
 
         # print process started to output file
         self._output.write(
@@ -57,26 +57,10 @@ class Process(threading.Thread):
 
         # run thread for its service time
         while remaining_time >= 0:
-            # TODO: Debug synchronization
-            # get current command
-            command = self._commands.get_cmd_list()[self._commands.current_cmd()]
 
-            self.lock.acquire()
-            # print info
-            print("Command: {} Running on Process: {} at time {}".format(command, self._process_id,
-                                                                         self.clock_thread.get_time()))
-            # block access to critical section
+            # run a command
+            self.run_command()
 
-            # call api
-            self.manager_thread.call_api(command, self._process_id)
-
-            # # increment to next command
-            # self._commands.next_cmd()
-
-            # wait for a random amount of time
-            self.lock.release()
-
-            # release access to critical section
             if self._terminate_time - self.clock_thread.get_time()/1000 > 0:
                 self.clock_thread.wait(
                     min(self.clock_thread.get_time() - self._start_time, self.rand.randrange(10, 1000)))
@@ -87,7 +71,8 @@ class Process(threading.Thread):
         self.proc_list.pop(0) if self.proc_list[0].get_id() == self._process_id else self.proc_list.pop(1)
 
         # print thread status to console
-        print("\nExiting {} {} Thread".format(self.name, self._process_id))
+        print("\nExiting Process {} Thread".format(self._process_id))
+
         # TODO: Debug clock printout and update time, sometimes we get far from the required timeout time
         # TODO: Timing off probably again due to synchronization
         # TODO: Maybe improve clock accuracy
@@ -111,3 +96,15 @@ class Process(threading.Thread):
 
     def get_id(self):
         return self._process_id
+
+    def run_command(self):
+        # get current command
+        self.lock.acquire()
+        command = self._commands.get_cmd_list()[self._commands.current_cmd()]
+
+        # # print info
+        # print("Command: {} Running on Process: {} at time {}".format(command, self._process_id,
+        #                                                              self.clock_thread.get_time()))
+        # call api
+        self.manager_thread.call_api(command, self._process_id)
+        self.lock.release()
