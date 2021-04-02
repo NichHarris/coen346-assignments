@@ -58,6 +58,7 @@ class Manager(threading.Thread):
     # execute Lookup API
     def look_up(self, variableId: str):
         value = self._v_mem.get_page(variableId)
+        print("Memory {} \n Access: {} ".format(self._v_mem.get_memory(), self._v_mem.get_access_list()))
         if value == -1:
             return self.swap(variableId)
         return value
@@ -70,12 +71,15 @@ class Manager(threading.Thread):
         # virtual memory copy
         mem_copy = self._v_mem.get_memory()[lru_index]
         # disk page copy
+        # self.lock.acquire()
         disk_copy = self._disk_page.read_from_page(variableId)
+        # self.lock.release()
         # while disk_copy == -1:
         #     disk_copy = self._disk_page.read_from_page(variableId)
         if disk_copy == -1:
             # doesn't exist in disk page
             print("SWAP error: No copy of variable on disk")        # write to output file
+            self._v_mem.set_access_val(lru_index)
             self._output.write(
                 "Clock: {}, {}, {}: Variable {} with Variable {}\n".format(self._clock_thread.get_time(), self._name, "Swap ERROR", variableId, mem_copy[0]))
             # self.lock.release()

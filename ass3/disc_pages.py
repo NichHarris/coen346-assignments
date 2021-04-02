@@ -58,6 +58,7 @@ class DiscPages:
 
     # find variableId in disk page
     def read_from_page(self, variableId: str):
+        # self.lock.acquire()
         with open('vm.txt', 'r') as disk_pg:
             disk = disk_pg.readlines()
 
@@ -65,8 +66,11 @@ class DiscPages:
             line = page.rstrip('\n').split(" ")
             if variableId == line[0]:
                 disk_pg.close()
+                # self.lock.release()
                 return line
         disk_pg.close()
+        print("here")
+        # self.lock.release()
         # TODO: Think of something better to do in this case
         return -1
 

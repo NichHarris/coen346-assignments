@@ -23,18 +23,15 @@ class VirtualMemory:
         self.init_memory()
         # access value for each page
         self.access_val = [0] * num_pages
+        # access num
+        self.access_num = 0
         # initialize the clock thread
         self.clock = t_clock
 
     # get a certain page from virtual memory
     def get_page(self, variableId: str):
-        # improved logic, uses access vaL list to set each memory pages access val
-        # this way we don't have to strip the access val from the data in memory
         i = 0
         for page in self._memory:
-            # print("memory: " + str(self._memory))
-            # print("variableId and page: " + str(variableId) + " , " + str(page))
-            # print("page[0]: " + str(page[0]))
             if page[0] == variableId:
                 self.set_access_val(i)
                 return page[1]
@@ -47,6 +44,7 @@ class VirtualMemory:
 
     def set_page_i(self, index: int, page: list):
         self._memory[index] = page
+        self.set_access_val(index)
 
     def set_page(self, variable: str):
         pass
@@ -63,7 +61,7 @@ class VirtualMemory:
     # release page from virtual memory
     def release_page(self, variableId):
         for i in range(0, self._num_pages):
-            if not self._memory[i]:
+            if self._memory[i]:
                 if self._memory[i][0] == variableId:
                     self._memory[i] = []
                     break
@@ -78,7 +76,9 @@ class VirtualMemory:
 
     # set the access val for a page
     def set_access_val(self, pos):
-        self.access_val[pos] = int(self.clock.get_time() / 1000)
+        self.access_num = self.access_num + 1
+        self.access_val[pos] = self.access_num + 1
+
 
     # get virtual memory
     def get_memory(self):
