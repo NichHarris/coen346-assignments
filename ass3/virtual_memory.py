@@ -5,6 +5,9 @@
 # Benjamin Grant 40059608
 #
 # Virtual Memory Management Simulator with Concurrency Control
+import threading
+from clock import Clock
+
 
 # class used to handle the virtual memory -> write/read
 class VirtualMemory:
@@ -12,26 +15,16 @@ class VirtualMemory:
     # default constructor
     def __init__(self, num_pages: int, t_clock):
         # list located in physical memory
-        # memory format: [last access time, variableId, value]
-        # self._memory = [[None, None] for i in range(num_pages)]
-        self._memory = [[] for i in range(num_pages)]
+        # memory format: [variableId, value]
+        self._memory = []
         # number of memory pages available
         self._num_pages = num_pages
+        # initialize virtual memory
+        self.init_memory()
         # access value for each page
-        self.access_val = [0]*num_pages
+        self.access_val = [0] * num_pages
         # initialize the clock thread
         self.clock = t_clock
-
-    # get a certain page from virtual memory
-    # def get_page(self, variableId: str):
-    #     # improved logic, uses access vaL list to set each memory pages access val
-    #     # this way we don't have to strip the access val from the data in memory
-    #     for i in range(0, self._num_pages - 1):
-    #         print("Test:" + str(variableId) + " " + str(self._memory[i][0]))
-    #         if self._memory[i][0] == variableId:
-    #             self.set_access_val(i)
-    #             return self._memory[i]
-    #     return -1
 
     # get a certain page from virtual memory
     def get_page(self, variableId: str):
@@ -39,65 +32,41 @@ class VirtualMemory:
         # this way we don't have to strip the access val from the data in memory
         i = 0
         for page in self._memory:
-            print("memory: " + str(self._memory))
-            print("variableId and page: " + str(variableId) + " , " + str(page))
-            print("page[0]: " + str(page[0]))
+            # print("memory: " + str(self._memory))
+            # print("variableId and page: " + str(variableId) + " , " + str(page))
+            # print("page[0]: " + str(page[0]))
             if page[0] == variableId:
                 self.set_access_val(i)
-                return page
+                return page[1]
             i += 1
         return -1
 
+    # return index of least recently used virtual memory page
     def get_lru_index(self):
-        lowest = self.access_val[0]
-        index = 0
-        for i in range(0, self._num_pages - 1):
-            if lowest >= self.access_val[i]:
-                lowest = self.access_val[i]
-                index = i
-        return index
+        return self.access_val.index(min(self.access_val))
 
-    # set the page for a certain spot in virtual memory
-    # def set_page(self, page: list):
-    #     print(self.access_val)
-    #     if self.is_full:
-    #         index = min(self.access_val)
-    #         self._memory[index] = page
-    #         self.set_access_val(index)
-    #     else:
-    #         for i in range(0, self._num_pages - 1):
-    #             if self._memory[i][0] == list[0]:
-    #                 self._memory[i] = page
-    #                 self.set_access_val(i)
-    #                 break
-    #             if not self._memory[i]:
-    #                 self._memory[i] = page
-    #                 self.set_access_val(i)
+    def set_page_i(self, index: int, page: list):
+        self._memory[index] = page
 
+    def set_page(self, variable: str):
+        pass
+
+    # fill memory if it has open spots
+    def fill_memory(self, variableId, value):
+        for i in range(0, self._num_pages):
+            if not self._memory[i]:
+                self._memory[i] = [variableId, value]
+                # update access value for that item
+                self.set_access_val(i)
+                break
+
+    # release page from virtual memory
     def release_page(self, variableId):
-        
-
-    # # set the page for a certain spot in virtual memory
-    # def set_page(self, _page: list):
-    #     # print("Access Time: " + str(self.access_val))
-    #     # print("Is Full?: " + str(self.is_full()))
-    #     if self.is_full():
-    #         index = self.access_val.index(min(self.access_val))
-    #         self._memory[index] = _page
-    #         self.set_access_val(index)
-    #     else:
-    #         i = 0
-    #         for page in self._memory:
-    #             print("Page: " + str(page))
-    #             if not page:
-    #                 self._memory[i] = _page
-    #                 self.set_access_val(i)
-    #                 break
-    #             if page[0] == _page[0]:
-    #                 self._memory[i] = _page
-    #                 self.set_access_val(i)
-    #                 break
-    #             i += 1
+        for i in range(0, self._num_pages):
+            if not self._memory[i]:
+                if self._memory[i][0] == variableId:
+                    self._memory[i] = []
+                    break
 
     # return number of memory pages
     def get_num_pages(self):
@@ -111,15 +80,37 @@ class VirtualMemory:
     def set_access_val(self, pos):
         self.access_val[pos] = int(self.clock.get_time() / 1000)
 
+    # get virtual memory
     def get_memory(self):
         return self._memory
 
+    # get list of access values
     def get_access_list(self):
         return self.access_val
 
-    # checks for empty spot in memory
+    # checks if memory is full
     def is_full(self):
         for page in self._memory:
             if not page:
                 return False
         return True
+
+    # initialize virtual memory to empty
+    def init_memory(self):
+        for j in range(0, self._num_pages):
+            self._memory.append([])
+
+
+# if __name__ == '__main__':
+#     cock = Clock()
+#     cock.start()
+#     vm = VirtualMemory(2, cock)
+#
+#     for i in range(0, 2):
+#         vm.fill_memory(i + 1, i * 3 + 5)
+#         cock.wait(1)
+#
+#     print(vm.get_memory())
+#     print(vm.get_access_list())
+#     cock.set_terminate(True)
+#     cock.join()

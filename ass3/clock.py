@@ -16,11 +16,11 @@ class Clock(threading.Thread):
     def __init__(self):
         # initialize clock thread
         super(Clock, self).__init__()
-        # set thread name
+        # set thread _name
         self.name = "Clock"
         # start timer
         self._total_elapsed_time = time.perf_counter()
-        # set terminate status
+        # set _terminate status
         self.terminate = False
 
     # run clock thread
@@ -48,6 +48,6 @@ class Clock(threading.Thread):
     def wait(self, duration):
         time.sleep(duration)
 
-    # set thread to terminate
+    # set thread to _terminate
     def set_terminate(self, state):
         self.terminate = state

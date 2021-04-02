@@ -80,22 +80,22 @@ if __name__ == '__main__':
     # create clock thread
     t_manager = Manager(memory, t_clock, disc_page, output)
     # create scheduling thread
-    t_sched = Scheduler(t_manager, cmd_obj, t_clock, thread_list, process_list, output, num_processes, num_cores)
+    t_scheduler = Scheduler(t_manager, cmd_obj, t_clock, thread_list, process_list, output, num_processes, num_cores)
 
     # start clock thread
     t_clock.start()
     # start vm manager thread
     t_manager.start()
     # start scheduler thread
-    t_sched.start()
+    t_scheduler.start()
 
     # append threads to thread_list
     thread_list.append(t_clock)
     thread_list.append(t_manager)
-    thread_list.append(t_sched)
+    thread_list.append(t_scheduler)
 
     # create process threads
-    t_sched.create_proc_thread()
+    t_scheduler.create_proc_thread()
 
     # print list of threads
     print(thread_list)

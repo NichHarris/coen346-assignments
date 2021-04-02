@@ -27,7 +27,7 @@ class FileManager:
         # list to store sorted result
         result = []
         
-        # terminate the active threads and return the resulting sublists
+        # _terminate the active threads and return the resulting sublists
         left_arr = left_arr.result()
         right_arr = right_arr.result()
 
@@ -65,7 +65,7 @@ class FileManager:
         if len(arr) > 1:
             # get the mid pointer for splitting lists (// returns the floor of the operation)
             mid = len(arr)//2
-            # instantiate a ThreadPoolExecutor to submit threads and terminate threads upon completion
+            # instantiate a ThreadPoolExecutor to submit threads and _terminate threads upon completion
             with ThreadPoolExecutor(max_workers = 15) as executor:
                 # execute a thread for both the left and right portion of the split list
                 # NOTE: arr[:mid] will only return the sublist from index 0 to mid-1

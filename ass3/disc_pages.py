@@ -14,7 +14,7 @@ class DiscPages:
         self._output = open("vm.txt", "w")
         self._output.close()
 
-    # write to disc page
+    # write to disk page
     def write_to_page(self, pg_list: list):
         self._output = open("vm.txt", "a")
         string = ""
@@ -24,21 +24,23 @@ class DiscPages:
         self._output.write("{}\n".format(string))
         self._output.close()
 
-    # find variableId in disc page
-    def read_from_page(self, variableId):
-        with open('vm.txt', 'r') as disc_pg:
-            pages = disc_pg.readlines()
-        for line in pages:
-            page = line.strip(" ")
-            print(page[0])
-            if variableId == page[0]:
+    # find variableId in disk page
+    def read_from_page(self, variableId: str):
+        with open('vm.txt', 'r') as disk_pg:
+            disk = disk_pg.readlines()
+        for line in disk:
+            page = line.rstrip('\n').split(" ")
+            if variableId == str(page[0]):
+                disk_pg.close()
                 return page
-        return [0,0]
+        disk_pg.close()
+        # TODO: Think of something better to do in this case
+        return -1
 
-    # find if variableId exists in disc page
+    # find if variableId exists in disk page
     def has_page(self, variableId):
-        with open('vm.txt', 'r') as disc_pg:
-            pages = disc_pg.readlines()
+        with open('vm.txt', 'r') as disk_pg:
+            pages = disk_pg.readlines()
         for line in pages:
             page = line.strip(" ")
             if variableId == page[0]:

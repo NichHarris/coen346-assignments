@@ -18,9 +18,9 @@ class Scheduler(threading.Thread):
     def __init__(self, manager, commands, clock, t_list, p_list, output_file, num_processes, num_cores):
         # initialize scheduling thread
         super(Scheduler, self).__init__()
-        # set thread name
+        # set thread _name
         self.name = "Scheduler"
-        # set terminate status
+        # set _terminate status
         self.terminate = False
         # initialize manager object
         self.manager_thread = manager
@@ -53,7 +53,7 @@ class Scheduler(threading.Thread):
         # print thread status to console
         print("\nExiting " + self.name + " Thread")
 
-    # set thread to terminate
+    # set thread to _terminate
     def set_terminate(self, state):
         self.terminate = state
 
@@ -69,7 +69,7 @@ class Scheduler(threading.Thread):
             if len(self._proc_list) != 0:
                 # holds process data: id, ready time, service time
                 proc_data = self._proc_list[0]
-
+                # TODO: Possibly change to using Lock() to lock scheduler from creating new processes is cores are in use
                 # create process thread if ready time is now or has passed, and there is cores available
                 if cur_time >= proc_data[1] and len(self._active_processes) != self._cores:
                     t_proc = Process(self.clock_thread, self.manager_thread, self._commands, self._active_processes, self._output, proc_data[0], cur_time, proc_data[2])

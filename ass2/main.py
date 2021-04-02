@@ -27,7 +27,7 @@ if __name__ == '__main__':
     # list containing the service time for each process
     service_time = []
 
-    # store the user name and number of processes as well as each process' ready time and service time in their respective variables
+    # store the user _name and number of processes as well as each process' ready time and service time in their respective variables
     for line in lines:
         if line[0].isalpha():
             user_dict[line.split(" ")[0]] = int(line.split(" ")[1].rstrip())
