@@ -8,6 +8,7 @@
 
 # import the necessary packages
 import threading
+from enum import Enum
 
 
 # class used to created a threaded virtual memory manage
@@ -30,7 +31,9 @@ class Manager(threading.Thread):
         self._disk_page = disk_page
         # initialize output file
         self._output = output_file
-
+        # state
+        self.state = "Free"
+        # synchronization
         self.lock = threading.Lock()
 
     def run(self):
@@ -66,23 +69,18 @@ class Manager(threading.Thread):
     # execute Swap if lookup located in disk space
     def swap(self, variableId: str):
         # index of least recently used virtual memory page
-        # self.lock.acquire()
         lru_index = self._v_mem.get_lru_index()
         # virtual memory copy
         mem_copy = self._v_mem.get_memory()[lru_index]
         # disk page copy
-        # self.lock.acquire()
         disk_copy = self._disk_page.read_from_page(variableId)
-        # self.lock.release()
-        # while disk_copy == -1:
-        #     disk_copy = self._disk_page.read_from_page(variableId)
         if disk_copy == -1:
             # doesn't exist in disk page
-            print("SWAP error: No copy of variable on disk")        # write to output file
+            print("SWAP error: No copy of variable on disk")  # write to output file
             self._v_mem.set_access_val(lru_index)
             self._output.write(
-                "Clock: {}, {}, {}: Variable {} with Variable {}\n".format(self._clock_thread.get_time(), self._name, "Swap ERROR", variableId, mem_copy[0]))
-            # self.lock.release()
+                "Clock: {}, {}, {}: Variable {} with Variable {}\n".format(self._clock_thread.get_time(), self._name,
+                                                                           "Swap ERROR", variableId, mem_copy[0]))
             return -1
         else:
             # set virtual memory to copy from disk
@@ -93,14 +91,15 @@ class Manager(threading.Thread):
 
         # write to output file
         self._output.write(
-            "Clock: {}, {}, {}: Variable {} with Variable {}\n".format(self._clock_thread.get_time(), self._name, "Swap", variableId, mem_copy[0]))
-        # self.lock.release()
+            "Clock: {}, {}, {}: Variable {} with Variable {}\n".format(self._clock_thread.get_time(), self._name,
+                                                                       "Swap", variableId, mem_copy[0]))
         return disk_copy[1]
 
     # TODO: Debug api calls timing, this probably relates to synchronization
     def call_api(self, command: list, p_id):
+        self.set_state("Running")
         self.commands.next_cmd()
-        self.lock.acquire()
+        # self.lock.acquire()
         if command[0] == "Store" and len(command) == 3:
             self.store(command[1], command[2])
             self.print_to_output(p_id, command[0], command[1], command[2])
@@ -112,7 +111,8 @@ class Manager(threading.Thread):
             self.print_to_output(p_id, command[0], command[1], value)
         else:
             print("Invalid command")
-        self.lock.release()
+        self.set_state("Free")
+        # self.lock.release()
 
     # set thread to _terminate
     def set_terminate(self, state):
@@ -122,7 +122,14 @@ class Manager(threading.Thread):
         # print process finished to output file
         if cmd == "Release":
             self._output.write(
-                "Clock: {}, Process {}: {}: Variable {}\n".format(self._clock_thread.get_time(), process_id, cmd, variableId))
+                "Clock: {}, Process {}: {}: Variable {}\n".format(self._clock_thread.get_time(), process_id, cmd,                                                              variableId))
         else:
             self._output.write(
-                "Clock: {}, Process {}: {}: Variable {}, Value: {}\n".format(self._clock_thread.get_time(), process_id, cmd, variableId, value))
+                "Clock: {}, Process {}: {}: Variable {}, Value: {}\n".format(self._clock_thread.get_time(), process_id,
+                                                                             cmd, variableId, value))
+
+    def set_state(self, new_state):
+        self.state = new_state
+
+    def get_state(self):
+        return self.state

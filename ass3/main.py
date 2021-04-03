@@ -80,7 +80,7 @@ if __name__ == '__main__':
     # create virtual memory object
     memory = VirtualMemory(num_pages, t_clock)
     # create clock thread
-    t_manager = Manager(memory, cmd_obj,t_clock, disc_page, output)
+    t_manager = Manager(memory, cmd_obj, t_clock, disc_page, output)
     # start vm manager thread
     t_manager.start()
     # create scheduling thread

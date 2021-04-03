@@ -32,16 +32,17 @@ class Process(threading.Thread):
         self._commands = commands
         # initialize output file
         self._output = output_file
-        # initialize start time
+        # initialize start time  in ms
         self._start_time = start_time
-        # initialize service time
+        # initialize service time in ms
         self._service_time = service_time
-        # terminate time
+        # terminate time in ms
         self._terminate_time = self._start_time + self._service_time
         # number of active threads
         self.proc_list = active_processes
+        # random number object
         self.rand = Random()
-        # lock
+        # synchronization
         self.lock = threading.Lock()
 
     # run process thread
@@ -53,19 +54,16 @@ class Process(threading.Thread):
         self._output.write(
             "Clock: {}, Process {}: {}\n".format(self.clock_thread.get_time(), self._process_id, "Started"))
 
-        remaining_time = self._terminate_time - self.clock_thread.get_time()/1000
-
         # run thread for its service time
-        while remaining_time >= 0:
+        while self._terminate_time >= self.clock_thread.get_time():
 
-            # run a command
-            self.run_command()
+            if self._terminate_time - self.clock_thread.get_time() > 500:
+                # run a command
+                self.run_command()
 
-            if self._terminate_time - self.clock_thread.get_time()/1000 > 0:
+            if self._terminate_time - self.clock_thread.get_time() > 0:
                 self.clock_thread.wait(
-                    min(self.clock_thread.get_time() - self._start_time, self.rand.randrange(10, 1000)))
-
-            remaining_time = self._terminate_time - self.clock_thread.get_time()/1000
+                    min(self._terminate_time - self.clock_thread.get_time(), self.rand.randrange(10, 1000)))
 
         # pop a process from terminated process (clears up a core)
         self.proc_list.pop(0) if self.proc_list[0].get_id() == self._process_id else self.proc_list.pop(1)
@@ -98,13 +96,15 @@ class Process(threading.Thread):
         return self._process_id
 
     def run_command(self):
-        # get current command
+        # synchronization to prevent the same commands from being run
         self.lock.acquire()
+        # get current command
         command = self._commands.get_cmd_list()[self._commands.current_cmd()]
 
-        # # print info
-        # print("Command: {} Running on Process: {} at time {}".format(command, self._process_id,
-        #                                                              self.clock_thread.get_time()))
+        # while self.manager_thread.get_state() == "Running":
+        #     pass
+
         # call api
         self.manager_thread.call_api(command, self._process_id)
+        # release lock
         self.lock.release()

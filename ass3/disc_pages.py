@@ -15,6 +15,7 @@ class DiscPages:
         self._output = open("vm.txt", "w")
         self._output.close()
         self.lock = threading.Lock()
+        self.disk_mem = []
 
     # write to disk page
     def write_to_page(self, pg_list: list):
@@ -25,6 +26,7 @@ class DiscPages:
             line = page.rstrip('\n').split(" ")
             if line[0] == pg_list[0]:
                 self.replace(pages, pg_list)
+                self.lock.release()
                 return
         self.append_to_page(pg_list)
 
@@ -46,19 +48,16 @@ class DiscPages:
                     for val in line:
                         string += str(val)
                         string += " "
-                        print("here1: " + string)
                     disk.write("{}\n".format(string.rstrip()))
                 else:
                     for val in pg_list:
                         string += str(val)
                         string += " "
-                        print("here2: " + string)
                     disk.write("{}\n".format(string.rstrip()))
         disk.close()
 
     # find variableId in disk page
     def read_from_page(self, variableId: str):
-        # self.lock.acquire()
         with open('vm.txt', 'r') as disk_pg:
             disk = disk_pg.readlines()
 
@@ -66,12 +65,9 @@ class DiscPages:
             line = page.rstrip('\n').split(" ")
             if variableId == line[0]:
                 disk_pg.close()
-                # self.lock.release()
+                self.lock.release()
                 return line
         disk_pg.close()
-        print("here")
-        # self.lock.release()
-        # TODO: Think of something better to do in this case
         return -1
 
     # find if variableId exists in disk page
@@ -83,6 +79,17 @@ class DiscPages:
             if variableId == page[0]:
                 return True
         return False
+
+    # write to file
+    def write_to_file(self):
+        self._output = open("vm.txt", "w")
+        for page in self.disk_mem:
+            string = ""
+            for val in page:
+                string += str(val)
+                string += " "
+            self._output.write("{}\n".format(string.rstrip()))
+            self._output.close()
 
 # if __name__ == '__main__':
 #

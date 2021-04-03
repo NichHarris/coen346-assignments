@@ -65,14 +65,14 @@ class Scheduler(threading.Thread):
     def create_proc_thread(self):
         while True:
             # update time and round to the second
-            cur_time = self.clock_thread.get_time()/1000
+            cur_time = self.clock_thread.get_time()
             if len(self._proc_list) != 0:
                 # holds process data: id, ready time, service time
                 proc_data = self._proc_list[0]
                 # TODO: Possibly change to using Lock() to lock scheduler from creating new processes is cores are in use
                 # create process thread if ready time is now or has passed, and there is cores available
-                if cur_time >= proc_data[1] and len(self._active_processes) != self._cores:
-                    t_proc = Process(self.clock_thread, self.manager_thread, self._commands, self._active_processes, self._output, proc_data[0], cur_time, proc_data[2])
+                if cur_time >= proc_data[1]*1000 and len(self._active_processes) != self._cores:
+                    t_proc = Process(self.clock_thread, self.manager_thread, self._commands, self._active_processes, self._output, proc_data[0], cur_time, proc_data[2]*1000)
                     t_proc.start()
                     t_proc.setName(proc_data[0])
                     self._thread_list.append(t_proc)
