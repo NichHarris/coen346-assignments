@@ -50,7 +50,7 @@ class Manager(threading.Thread):
     # execute Store API
     def store(self, variableId: str, value: int):
         if self._v_mem.is_full():
-            self._disk_page.write_to_page([variableId, value])
+            self._disk_page.add_page([variableId, value])
         else:
             self._v_mem.fill_memory(variableId, value)
 
@@ -61,7 +61,6 @@ class Manager(threading.Thread):
     # execute Lookup API
     def look_up(self, variableId: str):
         value = self._v_mem.get_page(variableId)
-        print("Memory {} \n Access: {} ".format(self._v_mem.get_memory(), self._v_mem.get_access_list()))
         if value == -1:
             return self.swap(variableId)
         return value
@@ -73,7 +72,7 @@ class Manager(threading.Thread):
         # virtual memory copy
         mem_copy = self._v_mem.get_memory()[lru_index]
         # disk page copy
-        disk_copy = self._disk_page.read_from_page(variableId)
+        disk_copy = self._disk_page.read_from_pg(variableId)
         if disk_copy == -1:
             # doesn't exist in disk page
             print("SWAP error: No copy of variable on disk")  # write to output file
@@ -87,7 +86,7 @@ class Manager(threading.Thread):
             self._v_mem.set_page_i(lru_index, disk_copy)
 
         # update disk page with former virtual memory page
-        self._disk_page.write_to_page(mem_copy)
+        self._disk_page.add_page(mem_copy)
 
         # write to output file
         self._output.write(
@@ -99,7 +98,6 @@ class Manager(threading.Thread):
     def call_api(self, command: list, p_id):
         self.set_state("Running")
         self.commands.next_cmd()
-        # self.lock.acquire()
         if command[0] == "Store" and len(command) == 3:
             self.store(command[1], command[2])
             self.print_to_output(p_id, command[0], command[1], command[2])
@@ -112,7 +110,6 @@ class Manager(threading.Thread):
         else:
             print("Invalid command")
         self.set_state("Free")
-        # self.lock.release()
 
     # set thread to _terminate
     def set_terminate(self, state):

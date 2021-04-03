@@ -84,7 +84,7 @@ if __name__ == '__main__':
     # start vm manager thread
     t_manager.start()
     # create scheduling thread
-    t_scheduler = Scheduler(t_manager, cmd_obj, t_clock, thread_list, process_list, output, num_processes, num_cores)
+    t_scheduler = Scheduler(t_manager, cmd_obj, t_clock, thread_list, process_list, output, num_cores)
     # start scheduler thread
     t_scheduler.start()
 
@@ -96,6 +96,7 @@ if __name__ == '__main__':
     # create process threads
     t_scheduler.create_proc_thread()
 
+    disc_page.write_to_file()
     # print list of threads
     print(thread_list)
 

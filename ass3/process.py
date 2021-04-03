@@ -46,6 +46,7 @@ class Process(threading.Thread):
         self.lock = threading.Lock()
 
     # run process thread
+    # TODO: Improve this
     def run(self):
         # print thread status to console
         print("\nStarting Process {} Thread".format(self._process_id))
@@ -55,7 +56,7 @@ class Process(threading.Thread):
             "Clock: {}, Process {}: {}\n".format(self.clock_thread.get_time(), self._process_id, "Started"))
 
         # run thread for its service time
-        while self._terminate_time >= self.clock_thread.get_time():
+        while self.clock_thread.get_time() < self._terminate_time or self.terminate:
 
             if self._terminate_time - self.clock_thread.get_time() > 500:
                 # run a command
@@ -71,9 +72,6 @@ class Process(threading.Thread):
         # print thread status to console
         print("\nExiting Process {} Thread".format(self._process_id))
 
-        # TODO: Debug clock printout and update time, sometimes we get far from the required timeout time
-        # TODO: Timing off probably again due to synchronization
-        # TODO: Maybe improve clock accuracy
         # print process finished to output file
         self._output.write(
             "Clock: {}, Process {}: {}\n".format(self.clock_thread.get_time(), self._process_id, "Finished"))
@@ -89,22 +87,21 @@ class Process(threading.Thread):
                 self.clock_thread.get_time(), self._process_id,
                 state))
 
-    def get_start_time(self):
-        return self._start_time
-
+    # get id number of a process
     def get_id(self):
         return self._process_id
 
+    # run a command
     def run_command(self):
         # synchronization to prevent the same commands from being run
         self.lock.acquire()
+
         # get current command
         command = self._commands.get_cmd_list()[self._commands.current_cmd()]
 
-        # while self.manager_thread.get_state() == "Running":
-        #     pass
-
         # call api
-        self.manager_thread.call_api(command, self._process_id)
+        result = self.manager_thread.call_api(command, self._process_id)
+        if result == -1:
+            self.manager_thread.swap(command[1])
         # release lock
         self.lock.release()

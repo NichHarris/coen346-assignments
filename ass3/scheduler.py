@@ -15,7 +15,7 @@ from process import Process
 class Scheduler(threading.Thread):
 
     # default constructor
-    def __init__(self, manager, commands, clock, t_list, p_list, output_file, num_processes, num_cores):
+    def __init__(self, manager, commands, clock, t_list, p_list, output_file, num_cores):
         # initialize scheduling thread
         super(Scheduler, self).__init__()
         # set thread _name
@@ -34,8 +34,6 @@ class Scheduler(threading.Thread):
         self._proc_list = p_list
         # initialize output file
         self._output = output_file
-        # number of processes
-        self.num_proc = num_processes
         # number of cores
         self._cores = num_cores
         # number of active threads
@@ -57,27 +55,24 @@ class Scheduler(threading.Thread):
     def set_terminate(self, state):
         self.terminate = state
 
-    # get list of active processes
-    def get_active_proc(self):
-        return self._active_processes
-
     # create process threads
     def create_proc_thread(self):
         while True:
             # update time and round to the second
             cur_time = self.clock_thread.get_time()
+
             if len(self._proc_list) != 0:
                 # holds process data: id, ready time, service time
                 proc_data = self._proc_list[0]
-                # TODO: Possibly change to using Lock() to lock scheduler from creating new processes is cores are in use
+
                 # create process thread if ready time is now or has passed, and there is cores available
                 if cur_time >= proc_data[1]*1000 and len(self._active_processes) != self._cores:
                     t_proc = Process(self.clock_thread, self.manager_thread, self._commands, self._active_processes, self._output, proc_data[0], cur_time, proc_data[2]*1000)
                     t_proc.start()
-                    t_proc.setName(proc_data[0])
                     self._thread_list.append(t_proc)
                     self._active_processes.append(t_proc)
                     self._proc_list.pop(0)
+
             # break out of process creation
             if len(self._active_processes) == 0 and len(self._proc_list) == 0:
                 break
