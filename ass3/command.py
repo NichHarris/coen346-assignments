@@ -25,6 +25,7 @@ class Commands:
     def next_cmd(self):
         self._cmd_index = (self._cmd_index + 1) % len(self._cmd_list)
 
+    # return list of commands
     def get_cmd_list(self):
         return self._cmd_list
 

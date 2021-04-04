@@ -5,8 +5,8 @@
 # Benjamin Grant 40059608
 #
 # Virtual Memory Management Simulator with Concurrency Control
-import time
-import threading
+
+
 # class used to handle the disc pages -> write/read to a file
 class DiscPages:
 
@@ -79,29 +79,28 @@ class DiscPages:
     # #             return True
     # #     return False
 
+    # add or replace page to disk
     def add_page(self, pg_list: list):
         if self.has_page(pg_list[0]):
-            print("swap")
             self.swap_page(pg_list)
         else:
-            print("add")
             self.disk_mem.append(pg_list)
 
-    # read value of certain ID
+    # return page of given variableId
     def read_from_pg(self, variableId: str):
         for page in self.disk_mem:
             if variableId == page[0]:
                 return page
         return -1
 
-    # swap a page
+    # replace a page
     def swap_page(self, pg_list: list):
         for i in range(0, len(self.disk_mem)):
             if self.disk_mem[i][0] == pg_list[0]:
                 self.disk_mem[i] = pg_list
 
     # find if variableId exists in disk page
-    def has_page(self, variableId :str):
+    def has_page(self, variableId: str):
         for page in self.disk_mem:
             if variableId == page[0]:
                 return True
@@ -117,7 +116,6 @@ class DiscPages:
                 string += " "
             self._output.write("{}\n".format(string.rstrip()))
         self._output.close()
-
 
 # if __name__ == '__main__':
 #

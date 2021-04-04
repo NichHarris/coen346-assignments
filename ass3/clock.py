@@ -23,7 +23,7 @@ class Clock(threading.Thread):
         # set _terminate status
         self.terminate = False
 
-    # run clock thread
+    # run thread when thread.start() is called
     def run(self):
         # print thread status to console
         print("\nStarting " + self.name + " Thread")

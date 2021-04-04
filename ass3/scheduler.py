@@ -39,7 +39,7 @@ class Scheduler(threading.Thread):
         # number of active threads
         self._active_processes = []
 
-    # run scheduler thread
+    # run thread when thread.start() is called
     def run(self):
         # print thread status to console
         print("\nStarting " + self.name + " Thread")

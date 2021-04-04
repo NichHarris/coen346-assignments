@@ -39,51 +39,53 @@ class Process(threading.Thread):
         # terminate time in ms
         self._terminate_time = self._start_time + self._service_time
         # number of active threads
-        self.proc_list = active_processes
+        self._active_proc = active_processes
         # random number object
         self.rand = Random()
         # synchronization
         self.lock = threading.Lock()
 
-    # run process thread
-    # TODO: Improve this
+    # run thread when thread.start() is called
     def run(self):
+
         # print thread status to console
         print("\nStarting Process {} Thread".format(self._process_id))
 
         # print process started to output file
-        self._output.write(
-            "Clock: {}, Process {}: {}\n".format(self.clock_thread.get_time(), self._process_id, "Started"))
+        self.print_to_file(self._process_id, "Started")
 
+        # TODO: Improve this
         # run thread for its service time
         while self.clock_thread.get_time() < self._terminate_time or self.terminate:
 
-            if self._terminate_time - self.clock_thread.get_time() > 500:
-                # run a command
-                self.run_command()
+            # run a command
+            self.run_command()
 
+            # check if time remaining is non negative and then sleep for random time between 10 and 1000 ms
             if self._terminate_time - self.clock_thread.get_time() > 0:
                 self.clock_thread.wait(
                     min(self._terminate_time - self.clock_thread.get_time(), self.rand.randrange(10, 1000)))
 
-        # pop a process from terminated process (clears up a core)
-        self.proc_list.pop(0) if self.proc_list[0].get_id() == self._process_id else self.proc_list.pop(1)
+        # remove finished process from active process list (clears up a core)
+        for i in range(0, len(self._active_proc)):
+            if self._active_proc[i].get_id() == self._process_id:
+                self._active_proc.pop(i)
+                break
 
         # print thread status to console
         print("\nExiting Process {} Thread".format(self._process_id))
 
         # print process finished to output file
-        self._output.write(
-            "Clock: {}, Process {}: {}\n".format(self.clock_thread.get_time(), self._process_id, "Finished"))
+        self.print_to_file(self._process_id, "Finished")
 
     # set thread to _terminate
     def set_terminate(self, state):
         self.terminate = state
 
     # print output message to file
-    def print_to_file(self, process, state):
+    def print_to_file(self, process, state: str):
         self._output.write(
-            "Clock: {}, Process {}: {}\n".format(
+            "Clock: {}, Process {}: {}.\n".format(
                 self.clock_thread.get_time(), self._process_id,
                 state))
 

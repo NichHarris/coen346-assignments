@@ -13,7 +13,7 @@ from clock import Clock
 class VirtualMemory:
 
     # default constructor
-    def __init__(self, num_pages: int, t_clock):
+    def __init__(self, num_pages: int):
         # list located in physical memory
         # memory format: [variableId, value]
         self._memory = []
@@ -25,8 +25,6 @@ class VirtualMemory:
         self.access_val = [0] * num_pages
         # access num
         self.access_num = 0
-        # initialize the clock thread
-        self.clock = t_clock
 
     # get a certain page from virtual memory
     def get_page(self, variableId: str):
@@ -42,12 +40,10 @@ class VirtualMemory:
     def get_lru_index(self):
         return self.access_val.index(min(self.access_val))
 
-    def set_page_i(self, index: int, page: list):
+    # set a specific page
+    def set_page(self, index: int, page: list):
         self._memory[index] = page
         self.set_access_val(index)
-
-    def set_page(self, variable: str):
-        pass
 
     # fill memory if it has open spots
     def fill_memory(self, variableId, value):
@@ -66,27 +62,14 @@ class VirtualMemory:
                     self._memory[i] = []
                     break
 
-    # return number of memory pages
-    def get_num_pages(self):
-        return self._num_pages
-
-    # return access val of given page number
-    def get_access_val(self, pos):
-        return self.access_val[pos]
-
     # set the access val for a page
     def set_access_val(self, pos):
         self.access_num = self.access_num + 1
         self.access_val[pos] = self.access_num + 1
 
-
     # get virtual memory
     def get_memory(self):
         return self._memory
-
-    # get list of access values
-    def get_access_list(self):
-        return self.access_val
 
     # checks if memory is full
     def is_full(self):
@@ -99,18 +82,3 @@ class VirtualMemory:
     def init_memory(self):
         for j in range(0, self._num_pages):
             self._memory.append([])
-
-
-# if __name__ == '__main__':
-#     cock = Clock()
-#     cock.start()
-#     vm = VirtualMemory(2, cock)
-#
-#     for i in range(0, 2):
-#         vm.fill_memory(i + 1, i * 3 + 5)
-#         cock.wait(1)
-#
-#     print(vm.get_memory())
-#     print(vm.get_access_list())
-#     cock.set_terminate(True)
-#     cock.join()

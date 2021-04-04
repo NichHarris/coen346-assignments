@@ -8,7 +8,6 @@
 
 # import the necessary packages
 import threading
-from enum import Enum
 
 
 # class used to created a threaded virtual memory manage
@@ -31,11 +30,8 @@ class Manager(threading.Thread):
         self._disk_page = disk_page
         # initialize output file
         self._output = output_file
-        # state
-        self.state = "Free"
-        # synchronization
-        self.lock = threading.Lock()
 
+    # run thread when thread.start() is called
     def run(self):
         # print thread status to console
         print("\nStarting " + self._name + " Thread")
@@ -73,6 +69,7 @@ class Manager(threading.Thread):
         mem_copy = self._v_mem.get_memory()[lru_index]
         # disk page copy
         disk_copy = self._disk_page.read_from_pg(variableId)
+
         if disk_copy == -1:
             # doesn't exist in disk page
             print("SWAP error: No copy of variable on disk")  # write to output file
@@ -83,7 +80,7 @@ class Manager(threading.Thread):
             return -1
         else:
             # set virtual memory to copy from disk
-            self._v_mem.set_page_i(lru_index, disk_copy)
+            self._v_mem.set_page(lru_index, disk_copy)
 
         # update disk page with former virtual memory page
         self._disk_page.add_page(mem_copy)
@@ -96,7 +93,6 @@ class Manager(threading.Thread):
 
     # TODO: Debug api calls timing, this probably relates to synchronization
     def call_api(self, command: list, p_id):
-        self.set_state("Running")
         self.commands.next_cmd()
         if command[0] == "Store" and len(command) == 3:
             self.store(command[1], command[2])
@@ -109,7 +105,6 @@ class Manager(threading.Thread):
             self.print_to_output(p_id, command[0], command[1], value)
         else:
             print("Invalid command")
-        self.set_state("Free")
 
     # set thread to _terminate
     def set_terminate(self, state):
@@ -124,9 +119,3 @@ class Manager(threading.Thread):
             self._output.write(
                 "Clock: {}, Process {}: {}: Variable {}, Value: {}\n".format(self._clock_thread.get_time(), process_id,
                                                                              cmd, variableId, value))
-
-    def set_state(self, new_state):
-        self.state = new_state
-
-    def get_state(self):
-        return self.state

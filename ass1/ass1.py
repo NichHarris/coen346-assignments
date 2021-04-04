@@ -10,12 +10,12 @@
 import threading
 from concurrent.futures import ThreadPoolExecutor
 
-# class used to write to output.txt without having to pass it as an argument to merge() and merge_sort()
+# class used to write to output_temp.txt without having to pass it as an argument to merge() and merge_sort()
 class FileManager:
 
     # initialize the output file for writing
     def __init__(self):
-        self.output = open("output.txt", "w")
+        self.output = open("output_temp.txt", "w")
 
     # sort and merge the sublists
     def merge_sort(self, left_arr, right_arr):
@@ -49,7 +49,7 @@ class FileManager:
         else:
             result += left_arr[lp:]
 
-        # write the status of the currently running thread (finished after exiting merge_sort()) to output.txt
+        # write the status of the currently running thread (finished after exiting merge_sort()) to output_temp.txt
         self.output.write("Thread {} finished: {}\n".format(threading.current_thread().ident, result))
         # return the resulting sorted list
         return result
@@ -57,7 +57,7 @@ class FileManager:
     # recursively divide the list into sublists
     def splitting(self, arr: list):
         # write the status of the currently running thread (started after entering the 
-        # splitting function) to output.txt
+        # splitting function) to output_temp.txt
         self.output.write("Thread {} started\n".format(threading.current_thread().ident))
         # keep track of active threads in splitting()
         # print(threading.active_count())s
@@ -76,7 +76,7 @@ class FileManager:
         # base case for the recursive algorithm
         # return the list containing a single element
         else:
-            # write the status of the currently running thread (finished after returning from base case) to output.txt
+            # write the status of the currently running thread (finished after returning from base case) to output_temp.txt
             self.output.write("Thread {} finished: {}\n".format(threading.current_thread().ident, arr))
             return arr
 

@@ -11,13 +11,13 @@ import threading
 import time
 
 
-# class used to handle the fair-share process scheduling and write to output.txt
+# class used to handle the fair-share process scheduling and write to output_temp.txt
 class Scheduler:
 
     # default constructor
     def __init__(self, m_processes: list, m_quantum):
         # initialize the output file for writing
-        self._output = open("output.txt", "w")
+        self._output = open("output_temp.txt", "w")
         # queue of processes which have not yet reached their ready time
         # enqueue: .append(), dequeue: .pop(0)
         self._new_processes = m_processes
