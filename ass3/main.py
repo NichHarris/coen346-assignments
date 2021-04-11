@@ -95,7 +95,7 @@ if __name__ == '__main__':
     t_scheduler.create_proc_thread()
 
     # TODO: This won't be needed once file I/O race conditions are handled
-    disc_page.write_to_file()
+    # disc_page.write_to_file()
 
     # print list of threads
     print(thread_list)

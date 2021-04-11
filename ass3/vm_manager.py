@@ -97,23 +97,24 @@ class Manager(threading.Thread):
         # return value
         return disk_copy[1]
 
-    # TODO: Debug api calls timing, this probably relates to synchronization
+    # perform api call
     def call_api(self, command: list, p_id, term_time):
+
         # add to queue
-        # self.queue.append(command)
+        self.queue.append(command)
 
         # update index of next command
         self.commands.next_cmd()
 
-        # simulate api call time
-        wait_time = min(term_time - self._clock_thread.get_time(), self.rand.randrange(10, 1000))/1000
-        if wait_time > 0:
-            time.sleep(wait_time)
+        # # simulate api call time
+        # wait_time = min(term_time - self._clock_thread.get_time(), self.rand.randrange(10, 1000))/1000
+        # if wait_time > 0:
+        #     time.sleep(wait_time)
 
-        # # wait for queue to clear up
-        # while len(self.queue) > 1:
-        #     print(len(self.queue))
-        #     pass
+        print(self.queue)
+        # # # wait for queue to clear up
+        while self.queue[0] != command:
+            pass
 
         # determine command to run
         value = 0
@@ -129,7 +130,9 @@ class Manager(threading.Thread):
         else:
             print("Invalid command")
 
-        # self.queue.pop(0)
+        # pop queue
+        self.queue.pop(0)
+
         # print to file status
         self.print_to_output(p_id, command[0], command[1], value)
 
@@ -139,6 +142,7 @@ class Manager(threading.Thread):
 
     # write to output file
     def print_to_output(self, process_id, cmd, variableId, value):
+
         # print process finished to output file
         if cmd == "Release":
             self._output.write(

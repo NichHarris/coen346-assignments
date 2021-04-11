@@ -58,7 +58,10 @@ class Process(threading.Thread):
         # TODO: Improve this
         # run thread for its service time
         while self._clock_thread.get_time() < self._terminate_time or self.terminate:
+
+            # run a command
             self.run_command()
+
             # simulate api call time
             wait_time = min(self._terminate_time - self._clock_thread.get_time(), self.rand.randrange(10, 1000))/1000
             if wait_time > 0:
