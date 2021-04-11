@@ -94,18 +94,19 @@ if __name__ == '__main__':
     # create process threads
     t_scheduler.create_proc_thread()
 
-    # TODO: This won't be needed once file I/O race conditions are handled
-    # disc_page.write_to_file()
-
+    # below is the end of the program
     # print list of threads
     print(thread_list)
 
-    # below is the end of the program
     # signal for clock and scheduler to stop running
     # join all threads
     for t in thread_list:
         t.set_terminate(True)
         t.join()
+
+    # print virtual memory
+    print("Virtual Memory: ")
+    print(memory.get_memory())
 
     # close output file
     output.close()

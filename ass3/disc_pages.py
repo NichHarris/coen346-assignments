@@ -23,7 +23,6 @@ class DiscPages:
             pages = disk.readlines()
         disk.close()
         for page in pages:
-            print("Here: " + page)
             line = page.rstrip('\n').split(" ")
             if str(line[0]) == str(pg_list[0]):
                 self.replace(pages, pg_list)
@@ -78,60 +77,3 @@ class DiscPages:
             if str(variableId) == str(page[0]):
                 return True
         return False
-
-    # # add or replace page to disk
-    # def add_page(self, pg_list: list):
-    #     if self.has_page(pg_list[0]):
-    #         self.swap_page(pg_list)
-    #     else:
-    #         self.disk_mem.append(pg_list)
-    #
-    # # return page of given variableId
-    # def read_from_pg(self, variableId: str):
-    #     for page in self.disk_mem:
-    #         if variableId == page[0]:
-    #             return page
-    #     return -1
-    #
-    # # replace a page
-    # def swap_page(self, pg_list: list):
-    #     for i in range(0, len(self.disk_mem)):
-    #         if self.disk_mem[i][0] == pg_list[0]:
-    #             self.disk_mem[i] = pg_list
-    #
-    # # find if variableId exists in disk page
-    # def has_page(self, variableId: str):
-    #     for page in self.disk_mem:
-    #         if variableId == page[0]:
-    #             return True
-    #     return False
-    #
-    # # write to file
-    # def write_to_file(self):
-    #     self._output = open("vm.txt", "w")
-    #     for page in self.disk_mem:
-    #         string = ""
-    #         for val in page:
-    #             string += str(val)
-    #             string += " "
-    #         self._output.write("{}\n".format(string.rstrip()))
-    #     self._output.close()
-
-# if __name__ == '__main__':
-#
-#     disk = DiscPages()
-#     memory = [["2", "7"], ["5", "6"]]
-#
-#     disk.write_to_page(["1", "3"])
-#     disk.write_to_page(["1", "4"])
-#     disk.write_to_page(["2", "6"])
-#
-#     for i in range(0, len(memory)):
-#         if disk.has_page(memory[i][0]):
-#             temp = memory[i]
-#             disk.write_to_page(["2", "6"])
-#             temp_disc = disk.read_from_page(temp[0])
-#             print("Disk temp: {}".format(temp_disc))
-#             memory[i] = temp_disc
-#             disk.write_to_page(temp)
-#     print(memory)

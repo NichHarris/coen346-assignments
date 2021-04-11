@@ -34,8 +34,10 @@ class Manager(threading.Thread):
         self._output = output_file
         # random number object
         self.rand = Random()
-        # queue for I/O
-        self.queue = []
+        # store status
+        self.status = False
+        # synchronization
+        self.lock = threading.Lock()
 
     # run thread when thread.start() is called
     def run(self):
@@ -99,28 +101,29 @@ class Manager(threading.Thread):
 
     # perform api call
     def call_api(self, command: list, p_id, term_time):
+        # acquire lock
+        self.lock.acquire()
 
-        # add to queue
-        self.queue.append(command)
-
-        # update index of next command
+        # # update index of next command
         self.commands.next_cmd()
 
         # # simulate api call time
-        # wait_time = min(term_time - self._clock_thread.get_time(), self.rand.randrange(10, 1000))/1000
-        # if wait_time > 0:
-        #     time.sleep(wait_time)
-
-        print(self.queue)
-        # # # wait for queue to clear up
-        while self.queue[0] != command:
-            pass
+        wait_time = min(term_time - self._clock_thread.get_time(), self.rand.randrange(10, 1000))/1000
+        if wait_time > 0:
+            time.sleep(wait_time)
+        else:
+            self.commands.prev_cmd()
+            # release lock
+            self.lock.release()
+            return
 
         # determine command to run
         value = 0
         if command[0] == "Store" and len(command) == 3:
+            self.status = True
             self.store(command[1], command[2])
             value = command[2]
+            self.status = False
         elif command[0] == "Release":
             self.release(command[1])
             value = None
@@ -130,11 +133,11 @@ class Manager(threading.Thread):
         else:
             print("Invalid command")
 
-        # pop queue
-        self.queue.pop(0)
-
         # print to file status
         self.print_to_output(p_id, command[0], command[1], value)
+
+        # release lock
+        self.lock.release()
 
     # set thread to _terminate
     def set_terminate(self, state):
