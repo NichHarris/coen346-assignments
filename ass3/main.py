@@ -75,8 +75,6 @@ if __name__ == '__main__':
     thread_list = []
     # create clock thread
     t_clock = Clock()
-    # start clock thread
-    t_clock.start()
     # create virtual memory object
     memory = VirtualMemory(num_pages)
     # create clock thread

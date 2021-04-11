@@ -8,6 +8,7 @@
 
 # import the necessary packages
 import threading
+import time
 from random import Random
 
 
@@ -25,7 +26,7 @@ class Process(threading.Thread):
         # set _terminate status
         self.terminate = False
         # initialize clock object
-        self.clock_thread = clock
+        self._clock_thread = clock
         # initialize manager object
         self.manager_thread = manager
         # initialize commands object
@@ -52,19 +53,15 @@ class Process(threading.Thread):
         print("\nStarting Process {} Thread".format(self._process_id))
 
         # print process started to output file
-        self.print_to_file(self._process_id, "Started")
+        self.print_to_file("Started", self._start_time)
 
         # TODO: Improve this
         # run thread for its service time
-        while self.clock_thread.get_time() < self._terminate_time or self.terminate:
+        while self._clock_thread.get_time() < self._terminate_time or self.terminate:
 
-            # run a command
             self.run_command()
-
-            # check if time remaining is non negative and then sleep for random time between 10 and 1000 ms
-            if self._terminate_time - self.clock_thread.get_time() > 0:
-                self.clock_thread.wait(
-                    min(self._terminate_time - self.clock_thread.get_time(), self.rand.randrange(10, 1000)))
+            # slow down execution of commands, so we don't have it run through the command list more than 2 times
+            # time.sleep(0.5)
 
         # remove finished process from active process list (clears up a core)
         for i in range(0, len(self._active_proc)):
@@ -76,17 +73,17 @@ class Process(threading.Thread):
         print("\nExiting Process {} Thread".format(self._process_id))
 
         # print process finished to output file
-        self.print_to_file(self._process_id, "Finished")
+        self.print_to_file("Finished", self._terminate_time)
 
     # set thread to _terminate
     def set_terminate(self, state):
         self.terminate = state
 
     # print output message to file
-    def print_to_file(self, process, state: str):
+    def print_to_file(self, state: str, _time):
         self._output.write(
             "Clock: {}, Process {}: {}.\n".format(
-                self.clock_thread.get_time(), self._process_id,
+                _time, self._process_id,
                 state))
 
     # get id number of a process
@@ -102,8 +99,8 @@ class Process(threading.Thread):
         command = self._commands.get_cmd_list()[self._commands.current_cmd()]
 
         # call api
-        result = self.manager_thread.call_api(command, self._process_id)
-        if result == -1:
-            self.manager_thread.swap(command[1])
+        self.manager_thread.call_api(command, self._process_id, self._terminate_time)
+
+        time.sleep(min(self._terminate_time - self._clock_thread.get_time(), self.rand.randrange(10, 1000))/1000)
         # release lock
         self.lock.release()

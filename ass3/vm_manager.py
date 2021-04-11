@@ -8,7 +8,8 @@
 
 # import the necessary packages
 import threading
-
+import time
+from random import Random
 
 # class used to created a threaded virtual memory manage
 class Manager(threading.Thread):
@@ -30,6 +31,8 @@ class Manager(threading.Thread):
         self._disk_page = disk_page
         # initialize output file
         self._output = output_file
+        # random number object
+        self.rand = Random()
 
     # run thread when thread.start() is called
     def run(self):
@@ -63,6 +66,7 @@ class Manager(threading.Thread):
 
     # execute Swap if lookup located in disk space
     def swap(self, variableId: str):
+
         # index of least recently used virtual memory page
         lru_index = self._v_mem.get_lru_index()
         # virtual memory copy
@@ -70,6 +74,7 @@ class Manager(threading.Thread):
         # disk page copy
         disk_copy = self._disk_page.read_from_pg(variableId)
 
+        # make sure there wasn't an error during swapping
         if disk_copy == -1:
             # doesn't exist in disk page
             print("SWAP error: No copy of variable on disk")  # write to output file
@@ -89,27 +94,40 @@ class Manager(threading.Thread):
         self._output.write(
             "Clock: {}, {}, {}: Variable {} with Variable {}\n".format(self._clock_thread.get_time(), self._name,
                                                                        "Swap", variableId, mem_copy[0]))
+        # return value
         return disk_copy[1]
 
     # TODO: Debug api calls timing, this probably relates to synchronization
-    def call_api(self, command: list, p_id):
+    def call_api(self, command: list, p_id, term_time):
+
+        # update index of next command
         self.commands.next_cmd()
+
+        # simulate api call time
+        # time.sleep(min(term_time - self._clock_thread.get_time(), self.rand.randrange(10, 1000))/1000)
+
+        # determine command to run
+        value = 0
         if command[0] == "Store" and len(command) == 3:
             self.store(command[1], command[2])
-            self.print_to_output(p_id, command[0], command[1], command[2])
+            value = command[2]
         elif command[0] == "Release":
             self.release(command[1])
-            self.print_to_output(p_id, command[0], command[1], None)
+            value = None
         elif command[0] == "Lookup":
             value = self.look_up(command[1])
-            self.print_to_output(p_id, command[0], command[1], value)
+            self._clock_thread.update_time(10)
         else:
             print("Invalid command")
+
+        # print to file status
+        self.print_to_output(p_id, command[0], command[1], value)
 
     # set thread to _terminate
     def set_terminate(self, state):
         self._terminate = state
 
+    # write to output file
     def print_to_output(self, process_id, cmd, variableId, value):
         # print process finished to output file
         if cmd == "Release":
