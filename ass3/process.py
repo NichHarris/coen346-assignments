@@ -59,6 +59,12 @@ class Process(threading.Thread):
         # run thread for its service time
         while self._clock_thread.get_time() < self._terminate_time or self.terminate:
             self.run_command()
+            # simulate api call time
+            wait_time = min(self._terminate_time - self._clock_thread.get_time(), self.rand.randrange(10, 1000))/1000
+            if wait_time > 0:
+                time.sleep(wait_time)
+            else:
+                break
 
         # remove finished process from active process list (clears up a core)
         for i in range(0, len(self._active_proc)):
@@ -97,9 +103,6 @@ class Process(threading.Thread):
 
         # call api
         self.manager_thread.call_api(command, self._process_id, self._terminate_time)
-
-        # simulate api call time
-        time.sleep(min(self._terminate_time - self._clock_thread.get_time(), self.rand.randrange(10, 1000))/1000)
 
         # release lock
         self.lock.release()

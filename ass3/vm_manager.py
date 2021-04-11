@@ -106,7 +106,9 @@ class Manager(threading.Thread):
         self.commands.next_cmd()
 
         # simulate api call time
-        time.sleep(min(term_time - self._clock_thread.get_time(), self.rand.randrange(10, 1000))/1000)
+        wait_time = min(term_time - self._clock_thread.get_time(), self.rand.randrange(10, 1000))/1000
+        if wait_time > 0:
+            time.sleep(wait_time)
 
         # # wait for queue to clear up
         # while len(self.queue) > 1:
