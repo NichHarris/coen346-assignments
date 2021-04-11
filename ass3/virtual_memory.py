@@ -5,8 +5,6 @@
 # Benjamin Grant 40059608
 #
 # Virtual Memory Management Simulator with Concurrency Control
-import threading
-from clock import Clock
 
 
 # class used to handle the virtual memory -> write/read

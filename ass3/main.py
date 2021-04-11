@@ -57,7 +57,7 @@ if __name__ == '__main__':
         process_list.append((proc_id, int(process.split(" ")[0]), int(process.split(" ")[1].rstrip())))
         proc_id += 1
 
-    # sort by ready time
+    # sort process list by ready time
     process_list.sort(key=lambda ready: ready[1])
 
     # close the files
@@ -94,8 +94,9 @@ if __name__ == '__main__':
     # create process threads
     t_scheduler.create_proc_thread()
 
-    print(memory.get_memory())
+    # TODO: This won't be needed once file I/O race conditions are handled
     disc_page.write_to_file()
+
     # print list of threads
     print(thread_list)
 

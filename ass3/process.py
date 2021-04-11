@@ -60,8 +60,6 @@ class Process(threading.Thread):
         while self._clock_thread.get_time() < self._terminate_time or self.terminate:
 
             self.run_command()
-            # slow down execution of commands, so we don't have it run through the command list more than 2 times
-            # time.sleep(0.5)
 
         # remove finished process from active process list (clears up a core)
         for i in range(0, len(self._active_proc)):
@@ -101,6 +99,8 @@ class Process(threading.Thread):
         # call api
         self.manager_thread.call_api(command, self._process_id, self._terminate_time)
 
+        # simulate api call time
         time.sleep(min(self._terminate_time - self._clock_thread.get_time(), self.rand.randrange(10, 1000))/1000)
+
         # release lock
         self.lock.release()

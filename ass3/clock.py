@@ -47,10 +47,6 @@ class Clock(threading.Thread):
         self._total_elapsed_time += _time
         time.sleep(_time/1000)
 
-    # wait for a specified duration
-    def wait(self, duration):
-        time.sleep(duration/1000)
-
     # set thread to _terminate
     def set_terminate(self, state):
         self.terminate = state

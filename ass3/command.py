@@ -6,7 +6,6 @@
 #
 # Virtual Memory Management Simulator with Concurrency Control
 
-import time
 
 # class used to handle the virtual memory -> write/read
 class Commands:

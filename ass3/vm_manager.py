@@ -8,8 +8,8 @@
 
 # import the necessary packages
 import threading
-import time
 from random import Random
+
 
 # class used to created a threaded virtual memory manage
 class Manager(threading.Thread):
@@ -76,9 +76,6 @@ class Manager(threading.Thread):
 
         # make sure there wasn't an error during swapping
         if disk_copy == -1:
-            # doesn't exist in disk page
-            print("SWAP error: No copy of variable on disk")  # write to output file
-            self._v_mem.set_access_val(lru_index)
             self._output.write(
                 "Clock: {}, {}, {}: Variable {} with Variable {}\n".format(self._clock_thread.get_time(), self._name,
                                                                            "Swap ERROR", variableId, mem_copy[0]))
@@ -102,9 +99,6 @@ class Manager(threading.Thread):
 
         # update index of next command
         self.commands.next_cmd()
-
-        # simulate api call time
-        # time.sleep(min(term_time - self._clock_thread.get_time(), self.rand.randrange(10, 1000))/1000)
 
         # determine command to run
         value = 0
