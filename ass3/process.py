@@ -58,7 +58,6 @@ class Process(threading.Thread):
         # TODO: Improve this
         # run thread for its service time
         while self._clock_thread.get_time() < self._terminate_time or self.terminate:
-
             self.run_command()
 
         # remove finished process from active process list (clears up a core)

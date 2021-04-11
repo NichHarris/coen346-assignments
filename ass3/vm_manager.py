@@ -8,6 +8,7 @@
 
 # import the necessary packages
 import threading
+import time
 from random import Random
 
 
@@ -33,6 +34,8 @@ class Manager(threading.Thread):
         self._output = output_file
         # random number object
         self.rand = Random()
+        # queue for I/O
+        self.queue = []
 
     # run thread when thread.start() is called
     def run(self):
@@ -96,9 +99,19 @@ class Manager(threading.Thread):
 
     # TODO: Debug api calls timing, this probably relates to synchronization
     def call_api(self, command: list, p_id, term_time):
+        # add to queue
+        # self.queue.append(command)
 
         # update index of next command
         self.commands.next_cmd()
+
+        # simulate api call time
+        time.sleep(min(term_time - self._clock_thread.get_time(), self.rand.randrange(10, 1000))/1000)
+
+        # # wait for queue to clear up
+        # while len(self.queue) > 1:
+        #     print(len(self.queue))
+        #     pass
 
         # determine command to run
         value = 0
@@ -114,6 +127,7 @@ class Manager(threading.Thread):
         else:
             print("Invalid command")
 
+        # self.queue.pop(0)
         # print to file status
         self.print_to_output(p_id, command[0], command[1], value)
 
