@@ -6,7 +6,7 @@
 #
 # Virtual Memory Management Simulator with Concurrency Control
 
-
+#TODO: this is the main memory no?
 # class used to handle the virtual memory -> write/read
 class VirtualMemory:
 

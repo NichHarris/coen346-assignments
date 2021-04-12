@@ -77,7 +77,7 @@ if __name__ == '__main__':
     t_clock = Clock()
     # create virtual memory object
     memory = VirtualMemory(num_pages)
-    # create clock thread
+    # create a vm manager
     t_manager = Manager(memory, cmd_obj, t_clock, disc_page, output)
     # start vm manager thread
     t_manager.start()

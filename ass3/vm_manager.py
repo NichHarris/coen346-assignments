@@ -12,7 +12,7 @@ import time
 from random import Random
 
 
-# class used to created a threaded virtual memory manage
+# class used to created a threaded virtual memory manager
 class Manager(threading.Thread):
 
     def __init__(self, memory, cmd_obj, clock, disk_page, output_file):
