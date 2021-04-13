@@ -25,7 +25,7 @@ class Clock(threading.Thread):
 
     # run thread when thread.start() is called
     def run(self):
-        # print thread status to console
+        # print clock status to console
         print("\nStarting " + self.name + " Thread")
 
         # give time for processes to come online
@@ -36,7 +36,7 @@ class Clock(threading.Thread):
             time.sleep(0.1)
             self._total_elapsed_time += 100
 
-        # print thread status to console
+        # print clock status to console
         print("\nExiting " + self.name + " Thread")
 
     # update and return the total elapsed time, rounded to nearest 10.
@@ -48,6 +48,6 @@ class Clock(threading.Thread):
         self._total_elapsed_time += _time
         time.sleep(_time/1000)
 
-    # set thread to _terminate
+    # set terminate state
     def set_terminate(self, state):
         self.terminate = state

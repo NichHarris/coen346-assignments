@@ -69,7 +69,7 @@ if __name__ == '__main__':
     # create disk page object
     disk_page = DiskPages()
 
-    # create command object
+    # create commands object
     cmd_obj = Commands(command_list)
 
     # create output file
