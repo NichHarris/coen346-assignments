@@ -55,16 +55,14 @@ class Process(threading.Thread):
         # print process started to output file
         self.print_to_file("Started", self._start_time)
 
-        # TODO: Improve this
         # run thread for its service time
         while self._clock_thread.get_time() < self._terminate_time or self.terminate:
+            
+            # run a command
             self.run_command()
-            # simulate api call time
-            wait_time = min(self._terminate_time - self._clock_thread.get_time(), self.rand.randrange(10, 1000))/1000
-            if wait_time > 0:
-                time.sleep(wait_time)
-            else:
-                break
+
+        # print process finished to output file
+        self.print_to_file("Finished", self._terminate_time)
 
         # remove finished process from active process list (clears up a core)
         for i in range(0, len(self._active_proc)):
@@ -75,9 +73,6 @@ class Process(threading.Thread):
         # print thread status to console
         print("\nExiting Process {} Thread".format(self._process_id))
 
-        # print process finished to output file
-        self.print_to_file("Finished", self._terminate_time)
-
     # set thread to _terminate
     def set_terminate(self, state):
         self.terminate = state
@@ -86,7 +81,7 @@ class Process(threading.Thread):
     def print_to_file(self, state: str, _time):
         self._output.write(
             "Clock: {}, Process {}: {}.\n".format(
-                _time, self._process_id,
+                round(_time/100)*100, self._process_id,
                 state))
 
     # get id number of a process
@@ -95,14 +90,26 @@ class Process(threading.Thread):
 
     # run a command
     def run_command(self):
+
         # synchronization to prevent the same commands from being run
         self.lock.acquire()
 
-        # get current command
-        command = self._commands.get_cmd_list()[self._commands.current_cmd()]
-
-        # call api
-        self.manager_thread.call_api(command, self._process_id, self._terminate_time)
+        # simulate api call time
+        wait_time = min(self._terminate_time - self._clock_thread.get_time(), self.rand.randrange(10, 1000))/1000
+        if wait_time <= 0:
+            self.set_terminate(True)
+        else:
+            # simulate call time
+            time.sleep(wait_time)
+            # ensure we aren't running a long command (one that needs to swap or write to disk_pages) too close to terminate time
+            if self._terminate_time - self._clock_thread.get_time() > 600:
+                # get current command
+                command = self._commands.get_cmd_list()[self._commands.current_cmd()]
+                # increment to next command
+                self._commands.next_cmd()
+                # call api
+                self.manager_thread.call_api(command, self._process_id, self._terminate_time)
 
         # release lock
         self.lock.release()
+
