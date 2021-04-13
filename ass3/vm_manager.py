@@ -8,8 +8,6 @@
 
 # import the necessary packages
 import threading
-import time
-from random import Random
 
 
 # class used to created a threaded virtual memory manage
@@ -28,14 +26,10 @@ class Manager(threading.Thread):
         self.commands = cmd_obj
         # initialize clock object
         self._clock_thread = clock
-        # initialize disc page object
+        # initialize disk page object
         self._disk_page = disk_page
         # initialize output file
         self._output = output_file
-        # random number object
-        self.rand = Random()
-        # store status
-        self.status = False
         # synchronization
         self.lock = threading.Lock()
 
@@ -69,7 +63,7 @@ class Manager(threading.Thread):
             return self.swap(variableId)
         return value
 
-    # execute Swap if lookup located in disk space
+    # execute Swap if Lookup located in disk space
     def swap(self, variableId: str):
 
         # index of least recently used virtual memory page
@@ -101,23 +95,11 @@ class Manager(threading.Thread):
 
     # perform api call
     def call_api(self, command: list, p_id, term_time):
+
         # acquire lock
         self.lock.acquire()
-
-        # # update index of next command
-        self.commands.next_cmd()
-
-        # # simulate api call time
-        wait_time = min(term_time - self._clock_thread.get_time(), self.rand.randrange(10, 1000))/1000
-        if wait_time > 0:
-            time.sleep(wait_time)
-        else:
-            self.commands.prev_cmd()
-            # release lock
-            self.lock.release()
-            return
-
-        # determine command to run
+        
+        # call api for command
         value = 0
         if command[0] == "Store" and len(command) == 3:
             self.status = True
@@ -133,11 +115,11 @@ class Manager(threading.Thread):
         else:
             print("Invalid command")
 
-        # print to file status
-        self.print_to_output(p_id, command[0], command[1], value)
-
         # release lock
         self.lock.release()
+
+        # print command results to output file
+        self.print_to_output(p_id, command[0], command[1], value)
 
     # set thread to _terminate
     def set_terminate(self, state):

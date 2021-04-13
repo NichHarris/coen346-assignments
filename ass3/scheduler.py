@@ -49,7 +49,7 @@ class Scheduler(threading.Thread):
             pass
 
         # print thread status to console
-        print("\nExiting " + self.name + " Thread")
+        print("\nExiting " + self.name + " Thread\n")
 
     # set thread to _terminate
     def set_terminate(self, state):
@@ -72,13 +72,13 @@ class Scheduler(threading.Thread):
                 proc_data = self._proc_list[0]
 
                 # create process thread if ready time is now or has passed, and there is cores available
-                if cur_time == proc_data[1]*1000 and len(self._active_processes) != self._cores:
+                if cur_time >= proc_data[1]*1000 and len(self._active_processes) != self._cores:
                     t_proc = Process(self.clock_thread, self.manager_thread, self._commands, self._active_processes, self._output, proc_data[0], cur_time, proc_data[2]*1000)
                     t_proc.start()
                     self._thread_list.append(t_proc)
                     self._active_processes.append(t_proc)
                     self._proc_list.pop(0)
-
+            
             # break out of process creation
-            if len(self._active_processes) == 0 and len(self._proc_list) == 0:
+            if len(self._active_processes) == 0 and len(self._proc_list) == 0:    
                 break

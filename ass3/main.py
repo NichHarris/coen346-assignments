@@ -10,7 +10,7 @@
 from clock import Clock
 from scheduler import Scheduler
 from vm_manager import Manager
-from disc_pages import DiscPages
+from disk_pages import DiskPages
 from virtual_memory import VirtualMemory
 from command import Commands
 
@@ -65,8 +65,8 @@ if __name__ == '__main__':
     proc_file.close()
     cmd_file.close()
 
-    # create disc page object
-    disc_page = DiscPages()
+    # create disk page object
+    disk_page = DiskPages()
     # create command object
     cmd_obj = Commands(command_list)
     # create output file
@@ -78,7 +78,7 @@ if __name__ == '__main__':
     # create virtual memory object
     memory = VirtualMemory(num_pages)
     # create clock thread
-    t_manager = Manager(memory, cmd_obj, t_clock, disc_page, output)
+    t_manager = Manager(memory, cmd_obj, t_clock, disk_page, output)
     # start vm manager thread
     t_manager.start()
     # create scheduling thread

@@ -7,8 +7,8 @@
 # Virtual Memory Management Simulator with Concurrency Control
 
 
-# class used to handle the disc pages -> write/read to a file
-class DiscPages:
+# class used to handle the disk pages -> write/read to a file
+class DiskPages:
 
     # default constructor
     def __init__(self):
@@ -16,7 +16,6 @@ class DiscPages:
         self._output.close()
         self.disk_mem = []
 
-    # TODO: Implement queue in vm_manager to handle file I/O race conditions
     # write to disk page
     def add_page(self, pg_list: list):
         with open("vm.txt", "r") as disk:
@@ -29,6 +28,7 @@ class DiscPages:
                 return
         self.append_to_page(pg_list)
 
+    # append a page to disk page
     def append_to_page(self, pg_list: list):
         self._output = open("vm.txt", "a")
         string = ""
@@ -38,6 +38,7 @@ class DiscPages:
         self._output.write("{}\n".format(string.rstrip()))
         self._output.close()
 
+    # replace a page in disk page
     def replace(self, disk_pages, pg_list):
         with open("vm.txt", "w") as disk:
             for page in disk_pages:
