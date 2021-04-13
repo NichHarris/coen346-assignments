@@ -19,7 +19,7 @@ if __name__ == '__main__':
 
     # open memconfig.txt and read file content
     with open('memconfig.txt', 'r') as mem_config:
-        cfg = mem_config.readlines()
+        m_cfg = mem_config.readlines()
     # open processes.txt and read file content
     with open('processes.txt', 'r') as proc_file:
         proc_lines = proc_file.readlines()
@@ -34,7 +34,7 @@ if __name__ == '__main__':
     # contains number of processes
     num_processes = int(proc_lines.pop(0))
     # contains number of memory pages
-    num_pages = int(cfg.pop(0))
+    num_pages = int(m_cfg.pop(0))
     # process dict
     process_list = []
 
@@ -42,6 +42,7 @@ if __name__ == '__main__':
     for command in commands:
         temp_list = []
         for cmd in command.split(" "):
+            # if its a word else its a number
             if cmd.isalpha():
                 temp_list.append(cmd)
             else:
@@ -60,27 +61,34 @@ if __name__ == '__main__':
     # sort process list by ready time
     process_list.sort(key=lambda ready: ready[1])
 
-    # close the files
+    # close the input files
     mem_config.close()
     proc_file.close()
     cmd_file.close()
 
     # create disk page object
     disk_page = DiskPages()
+
     # create command object
     cmd_obj = Commands(command_list)
+
     # create output file
     output = open("output.txt", "w")
+
     # create list containing all threads
     thread_list = []
-    # create clock thread
+
+    # create clock thread -> wait to start in the scheduler
     t_clock = Clock()
+
     # create virtual memory object
     memory = VirtualMemory(num_pages)
+
     # create a vm manager
     t_manager = Manager(memory, cmd_obj, t_clock, disk_page, output)
     # start vm manager thread
     t_manager.start()
+
     # create scheduling thread
     t_scheduler = Scheduler(t_manager, cmd_obj, t_clock, thread_list, process_list, output, num_cores)
     # start scheduler thread
@@ -104,7 +112,7 @@ if __name__ == '__main__':
         t.set_terminate(True)
         t.join()
 
-    # print virtual memory
+    # print virtual memory at end of execution
     print("Virtual Memory: ")
     print(memory.get_memory())
 

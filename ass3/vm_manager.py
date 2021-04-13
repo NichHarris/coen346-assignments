@@ -131,7 +131,7 @@ class Manager(threading.Thread):
         # print process finished to output file
         if cmd == "Release":
             self._output.write(
-                "Clock: {}, Process {}: {}: Variable {}\n".format(self._clock_thread.get_time(), process_id, cmd,                                                              variableId))
+                "Clock: {}, Process {}: {}: Variable {}\n".format(self._clock_thread.get_time(), process_id, cmd, variableId))
         else:
             self._output.write(
                 "Clock: {}, Process {}: {}: Variable {}, Value: {}\n".format(self._clock_thread.get_time(), process_id,

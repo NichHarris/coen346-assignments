@@ -34,7 +34,6 @@ class Clock(threading.Thread):
         # run thread
         while not self.terminate:
             time.sleep(0.1)
-            # self._total_elapsed_time = int(round(self._total_elapsed_time + 10)/10)*100
             self._total_elapsed_time += 100
 
         # print thread status to console

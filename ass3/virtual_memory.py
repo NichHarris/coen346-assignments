@@ -78,5 +78,5 @@ class VirtualMemory:
 
     # initialize virtual memory to empty
     def init_memory(self):
-        for j in range(0, self._num_pages):
+        for i in range(0, self._num_pages):
             self._memory.append([])

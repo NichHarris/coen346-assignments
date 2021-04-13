@@ -12,9 +12,9 @@ class DiskPages:
 
     # default constructor
     def __init__(self):
+        # create disk file
         self._output = open("vm.txt", "w")
         self._output.close()
-        self.disk_mem = []
 
     # write to disk page
     def add_page(self, pg_list: list):
