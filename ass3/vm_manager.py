@@ -13,7 +13,7 @@ import threading
 # class used to created a threaded virtual memory manager
 class Manager(threading.Thread):
 
-    def __init__(self, memory, cmd_obj, clock, disk_page, output_file):
+    def __init__(self, memory, cmd_obj, clock, disk_page, file_out):
         # initialize manager thread
         super(Manager, self).__init__()
         # set thread _name
@@ -28,8 +28,8 @@ class Manager(threading.Thread):
         self._clock_thread = clock
         # initialize disk page object
         self._disk_page = disk_page
-        # initialize output file
-        self._output = output_file
+        # initialize file out object
+        self._file_out = file_out
         # synchronization
         self.lock = threading.Lock()
 
@@ -75,7 +75,7 @@ class Manager(threading.Thread):
 
         # make sure there wasn't an error during swapping
         if disk_copy == -1:
-            self._output.write(
+            self._file_out.write(
                 "Clock: {}, {}, {}: Variable {} with Variable {}\n".format(self._clock_thread.get_time(), self._name,
                                                                            "Swap ERROR", variableId, mem_copy[0]))
             return -1
@@ -87,7 +87,7 @@ class Manager(threading.Thread):
         self._disk_page.add_page(mem_copy)
 
         # write to output file
-        self._output.write(
+        self._file_out.write(
             "Clock: {}, {}, {}: Variable {} with Variable {}\n".format(self._clock_thread.get_time(), self._name,
                                                                        "Swap", variableId, mem_copy[0]))
         # return value
@@ -102,16 +102,13 @@ class Manager(threading.Thread):
         # call api for command
         value = 0
         if command[0] == "Store" and len(command) == 3:
-            self.status = True
             self.store(command[1], command[2])
             value = command[2]
-            self.status = False
         elif command[0] == "Release":
             self.release(command[1])
             value = None
         elif command[0] == "Lookup":
             value = self.look_up(command[1])
-            self._clock_thread.update_time(10)
         else:
             print("Invalid command")
 
@@ -127,12 +124,12 @@ class Manager(threading.Thread):
 
     # write to output file
     def print_to_output(self, process_id, cmd, variableId, value):
-
+        self._clock_thread.update_time(10)
         # print process finished to output file
         if cmd == "Release":
-            self._output.write(
+            self._file_out.write(
                 "Clock: {}, Process {}: {}: Variable {}\n".format(self._clock_thread.get_time(), process_id, cmd, variableId))
         else:
-            self._output.write(
+            self._file_out.write(
                 "Clock: {}, Process {}: {}: Variable {}, Value: {}\n".format(self._clock_thread.get_time(), process_id,
                                                                              cmd, variableId, value))

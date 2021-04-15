@@ -33,7 +33,8 @@ class Clock(threading.Thread):
 
         # run thread
         while not self.terminate:
-            time.sleep(0.1)
+            
+            time.sleep(0.2)
             self._total_elapsed_time += 100
 
         # print clock status to console

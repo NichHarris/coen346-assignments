@@ -13,6 +13,7 @@ from vm_manager import Manager
 from disk_pages import DiskPages
 from virtual_memory import VirtualMemory
 from command import Commands
+from fileout import FileOut
 
 # entrypoint of script execution
 if __name__ == '__main__':
@@ -75,6 +76,8 @@ if __name__ == '__main__':
     # create output file
     output = open("output.txt", "w")
 
+    file_out = FileOut(output)
+
     # create list containing all threads
     thread_list = []
 
@@ -85,12 +88,12 @@ if __name__ == '__main__':
     memory = VirtualMemory(num_pages)
 
     # create a vm manager
-    t_manager = Manager(memory, cmd_obj, t_clock, disk_page, output)
+    t_manager = Manager(memory, cmd_obj, t_clock, disk_page, file_out)
     # start vm manager thread
     t_manager.start()
 
     # create scheduling thread
-    t_scheduler = Scheduler(t_manager, cmd_obj, t_clock, thread_list, process_list, output, num_cores)
+    t_scheduler = Scheduler(t_manager, cmd_obj, t_clock, thread_list, process_list, file_out, num_cores)
     # start scheduler thread
     t_scheduler.start()
 
@@ -116,5 +119,8 @@ if __name__ == '__main__':
     print("Virtual Memory: ")
     print(memory.get_memory())
 
+    # sort queue and write to output file
+    file_out.sort()
+    file_out.output()
     # close output file
     output.close()

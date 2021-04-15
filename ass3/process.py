@@ -16,7 +16,7 @@ from random import Random
 class Process(threading.Thread):
 
     # default constructor
-    def __init__(self, clock, manager, commands, active_processes, output_file, proc_id, start_time, service_time):
+    def __init__(self, clock, manager, commands, active_processes, file_out, proc_id, start_time, service_time):
         # initialize process thread
         super(Process, self).__init__()
         # set thread _name
@@ -31,8 +31,8 @@ class Process(threading.Thread):
         self.manager_thread = manager
         # initialize commands object
         self._commands = commands
-        # initialize output file
-        self._output = output_file
+        # initialize file out object
+        self._file_out = file_out
         # initialize start time  in ms
         self._start_time = start_time
         # initialize service time in ms
@@ -79,7 +79,7 @@ class Process(threading.Thread):
 
     # print output message to file
     def print_to_file(self, state: str, _time):
-        self._output.write(
+        self._file_out.write(
             "Clock: {}, Process {}: {}.\n".format(
                 round(_time/100)*100, self._process_id,
                 state))
