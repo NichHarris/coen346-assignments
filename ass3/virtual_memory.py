@@ -65,7 +65,6 @@ class VirtualMemory:
     def set_access_val(self, pos):
         self.access_num = self.access_num + 1
         self.access_val[pos] = self.access_num
-        print(self.access_val)
 
     # get virtual memory
     def get_memory(self):
