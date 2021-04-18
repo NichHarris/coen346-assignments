@@ -119,8 +119,10 @@ if __name__ == '__main__':
     print("Virtual Memory: ")
     print(memory.get_memory())
 
+
     # sort queue and write to output file
     file_out.sort()
     file_out.output()
+    
     # close output file
     output.close()
