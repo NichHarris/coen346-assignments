@@ -47,7 +47,7 @@ class VirtualMemory:
         for i in range(0, self._num_pages):
             if not self._memory[i]:
                 self._memory[i] = [str(variableId), str(value)]
-                # update access value for that item
+                # update access value for that page
                 self.set_access_val(i)
                 break
 
@@ -57,12 +57,15 @@ class VirtualMemory:
             if self._memory[i]:
                 if self._memory[i][0] == variableId:
                     self._memory[i] = []
+                    # update access value for that page
+                    self.set_access_val(i)
                     break
 
     # set the access val for a page
     def set_access_val(self, pos):
         self.access_num = self.access_num + 1
-        self.access_val[pos] = self.access_num + 1
+        self.access_val[pos] = self.access_num
+        print(self.access_val)
 
     # get virtual memory
     def get_memory(self):

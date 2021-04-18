@@ -17,7 +17,7 @@ class FileOut:
         # initialize output file
         self._output = output_file
 
-    # isolate the clock time and add it and the output line to a tuple in the queue
+    # isolate the clock time and add it and the output line to a tuple in the queue -> (time, msg)
     def write(self, line: str):
         components = line.split(",")
         clock = components[0].split(":")
